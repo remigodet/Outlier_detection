@@ -53,9 +53,9 @@ class Autoencoder(nn.Module):
         return decoded  # , latent
 
 
-epochs = 1
+epochs = 5
 batch_size = 32
-learning_rate = 1e-1
+learning_rate = 1e-2
 dataloader = DataLoader(dataset, batch_size=batch_size, shuffle=True)
 
 model = Autoencoder()
@@ -70,20 +70,19 @@ def training(epochs):
         for data in dataloader:
             ''' data est une liste de deux éléments, le premier (data[0])est un regroupement d'image (liste d'image) 
             donc c'est un mini batch et le deuxième (data[1]) est la liste des entiers correspondants aux images de la liste 1'''
-
+            # print("hello")
             #img, labels = data
             images, labels = data
             images = images.reshape(-1, 28*28)
             #img = img.view(img.size(0), -1).cuda()
             assert len(images) == len(labels)
-            for i in range(len(images)):
-                img = images[i]
-                output = model(img)
-                loss = loss_function(output, img)
 
-                loss.backward()
-                optimizer.step()
-                optimizer.zero_grad()
+            output = model(images)
+            loss = loss_function(output, images)
+
+            loss.backward()
+            optimizer.step()
+            optimizer.zero_grad()
         print(f'epoch [{epoch + 1}/{epochs}], loss:{loss.data.item()}')
 
 
