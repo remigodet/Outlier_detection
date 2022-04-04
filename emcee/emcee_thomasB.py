@@ -25,7 +25,7 @@ def MCMC(func):
     sampler = emcee.EnsembleSampler(
         nwalkers=number_of_walkers, ndim=number_of_dimensions, log_prob_fn=func_prime)
 
-    sampler.run_mcmc(initial_state=pos, nsteps=150n)
+    sampler.run_mcmc(initial_state=pos, nsteps=150)
     samples = sampler.get_chain(flat=True)
     return samples
 
