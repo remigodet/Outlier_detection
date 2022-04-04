@@ -72,14 +72,23 @@ for epoch in range(num_epochs):
 with torch.no_grad():
     dataiter = iter(data_loader)
     target_label = 2  # CHOOSE IMAGE NUMBER TO TARGET VIA MCMC
-    image, label = dataiter.next()
-    print(label.shape)
-    for j in range(len(image)):
-        if label[j] == target_label:
-            image = image[j]
-            label = label[j].item()
-            break
-    print(label)
+    # "zero" for initial state @ zero array
+    # "rd" for random initial states
+
+    if target_label == "zero":
+        image = [0]*28*28
+    elif target_label == "rd":
+        image = [0]*28*28 + np.random.rand(28*28)
+    else:
+        image, label = dataiter.next()
+        print(label.shape)
+        for j in range(len(image)):
+            if label[j] == target_label:
+                image = image[j]
+                label = label[j].item()
+                break
+        print(label)
+
     def func(x): return criteron(model(x), x)
     res_MCMC = MCMC(image.reshape(28*28), func)
 
