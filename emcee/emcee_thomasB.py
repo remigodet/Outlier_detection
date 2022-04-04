@@ -65,7 +65,7 @@ for epoch in range(num_epochs):
         data_MCMC = MCMC(loss)
         recon_MCMC = model(data_MCMC)
         loss_neg = criteron(data_MCMC, recon_MCMC)
-        loss = loss + loss_neg
+        loss = loss - loss_neg
         optimizer.zero_grad()
         loss.backward()
         optimizer.step()
