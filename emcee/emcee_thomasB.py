@@ -1,8 +1,3 @@
-
-
-from locale import DAY_1
-from turtle import forward
-from h11 import Data
 from matplotlib import pyplot as plt
 from matplotlib.transforms import Transform
 import torch
@@ -15,17 +10,22 @@ import numpy as np
 
 
 def MCMC(func):
-    number_of_dimensions = 28*28
-    number_of_walkers = 2
-    initial_states = [np.abs(np.random.randn(
-        number_of_walkers, number_of_dimensions))]
+
+    img = [0]*28*28
+    pos = img + np.random.randn(28*28*2, 28*28)
+    number_of_walkers, number_of_dimensions = pos.shape
 
     def func_prime(x):
         x.reshape(28*28)
-        return [func(x)]
+        x = torch.Tensor(x)
+        x = func(x)
+        x = x.numpy().flatten()
+        return x
+
     sampler = emcee.EnsembleSampler(
         nwalkers=number_of_walkers, ndim=number_of_dimensions, log_prob_fn=func_prime)
-    sampler.run_mcmc(initial_state=initial_states, nsteps=50)
+
+    sampler.run_mcmc(initial_state=pos, nsteps=150n)
     samples = sampler.get_chain(flat=True)
     return samples
 
@@ -35,7 +35,7 @@ transform = transforms.ToTensor()
 
 mnist_data = datasets.MNIST(root='./data', download=True, transform=transform)
 data_loader = torch.utils.data.DataLoader(
-    dataset=mnist_data, batch_size=64, shuffle=True)
+    dataset=mnist_data, batch_size=500, shuffle=True)
 
 dataiter = iter(data_loader)
 images, labels = dataiter.next()
@@ -44,10 +44,10 @@ images, labels = dataiter.next()
 class Autoencodeur(nn.Module):
     def __init__(self):
         super().__init__()
-        self.encoder = nn.Sequential(nn.Linear(28*28, 128), nn.ReLU(), nn.Linear(
+        self.encoder = nn.Sequential(nn.Linear(28*28, 612), nn.ReLU(), nn.Linear(612, 128), nn.ReLU(), nn.Linear(
             128, 64), nn.ReLU(), nn.Linear(64, 12), nn.ReLU(), nn.Linear(12, 3))
         self.decodeur = nn.Sequential(nn.Linear(3, 12), nn.ReLU(), nn.Linear(
-            12, 64), nn.ReLU(), nn.Linear(64, 128), nn.ReLU(), nn.Linear(128, 28*28), nn.Sigmoid())
+            12, 64), nn.ReLU(), nn.Linear(64, 128), nn.ReLU(), nn.Linear(128, 612), nn.ReLU(), nn.Linear(612, 28*28), nn.Sigmoid())
 
     def forward(self, x):
         encoded = self.encoder(x)
@@ -59,17 +59,13 @@ model = Autoencodeur()
 criteron = nn.MSELoss()
 optimizer = optim.Adam(model.parameters(), lr=1e-2, weight_decay=1e-5)
 
-num_epochs = 5
+num_epochs = 10
 outputs = []
 for epoch in range(num_epochs):
     for (img, _) in data_loader:
         img = img.reshape(-1, 28*28)
         recon = model(img)
         loss = criteron(recon, img)
-        data_MCMC = MCMC(loss)
-        recon_MCMC = model(data_MCMC)
-        loss_neg = criteron(data_MCMC, recon_MCMC)
-        loss = loss - loss_neg
         optimizer.zero_grad()
         loss.backward()
         optimizer.step()
@@ -77,25 +73,32 @@ for epoch in range(num_epochs):
     print(f'Epoch: {epoch+1}, Loss: {loss.item() : 4f}')
     outputs.append((epoch, img, recon))
 
-
-for k in range(0, num_epochs, 4):
-    plt.figure(figsize=(9, 2))
-    plt.gray()
-    imgs = outputs[k][1].detach().numpy()
-    recon = outputs[k][2].detach().numpy()
-    for i, item in enumerate(imgs):
-        if i >= 9:
-            break
-        plt.subplot(2, 9, i+1)
-        item = item.reshape(-1, 28, 28)
-        plt.imshow(item[0])
-
-    for i, item in enumerate(recon):
-        if i >= 9:
-            break
-        plt.subplot(2, 9, 9+i+1)
-        item = item.reshape(-1, 28, 28)
-        plt.imshow(item[0])
+with torch.no_grad():
+    def func(x): return criteron(model(x), x)
+    res_MCMC = MCMC(func)
 
 
+# VISU
+# for k in range(0, num_epochs, 4):
+#     plt.figure(figsize=(9, 2))
+#     plt.gray()
+#     imgs = outputs[k][1].detach().numpy()
+#     recon = outputs[k][2].detach().numpy()
+#     for i, item in enumerate(imgs):
+#         if i >= 9:
+#             break
+#         plt.subplot(2, 9, i+1)
+#         item = item.reshape(-1, 28, 28)
+#         plt.imshow(item[0])
+
+#     for i, item in enumerate(recon):
+#         if i >= 9:
+#             break
+#         plt.subplot(2, 9, 9+i+1)
+#         item = item.reshape(-1, 28, 28)
+#         plt.imshow(item[0])
+for i in range(3):
+    for j in range(3):
+        plt.subplot(3, 3, 1+i+3*j)
+        plt.imshow(res_MCMC[i+3*j].reshape(28, 28))
 plt.show()
