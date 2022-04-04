@@ -12,7 +12,6 @@ print(f(np.array([1, 1])))
 number_of_dimensions = 2
 number_of_walkers = 10
 initial_states = np.random.randn(number_of_walkers, number_of_dimensions)*10
-print(initial_states)
 sampler = emcee.EnsembleSampler(
     nwalkers=number_of_walkers, ndim=number_of_dimensions, log_prob_fn=f)
 sampler.run_mcmc(initial_state=initial_states, nsteps=50)

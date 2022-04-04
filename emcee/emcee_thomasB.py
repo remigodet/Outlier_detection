@@ -16,11 +16,15 @@ import numpy as np
 
 def MCMC(func):
     number_of_dimensions = 28*28
-    number_of_walkers = 100
-    initial_states = np.random.randn(
-        number_of_walkers, number_of_dimensions)
+    number_of_walkers = 2
+    initial_states = [np.abs(np.random.randn(
+        number_of_walkers, number_of_dimensions))]
+
+    def func_prime(x):
+        x.reshape(28*28)
+        return [func(x)]
     sampler = emcee.EnsembleSampler(
-        nwalkers=number_of_walkers, ndim=number_of_dimensions, log_prob_fn=func)
+        nwalkers=number_of_walkers, ndim=number_of_dimensions, log_prob_fn=func_prime)
     sampler.run_mcmc(initial_state=initial_states, nsteps=50)
     samples = sampler.get_chain(flat=True)
     return samples
@@ -55,7 +59,7 @@ model = Autoencodeur()
 criteron = nn.MSELoss()
 optimizer = optim.Adam(model.parameters(), lr=1e-2, weight_decay=1e-5)
 
-num_epochs = 10
+num_epochs = 5
 outputs = []
 for epoch in range(num_epochs):
     for (img, _) in data_loader:
@@ -72,3 +76,26 @@ for epoch in range(num_epochs):
 
     print(f'Epoch: {epoch+1}, Loss: {loss.item() : 4f}')
     outputs.append((epoch, img, recon))
+
+
+for k in range(0, num_epochs, 4):
+    plt.figure(figsize=(9, 2))
+    plt.gray()
+    imgs = outputs[k][1].detach().numpy()
+    recon = outputs[k][2].detach().numpy()
+    for i, item in enumerate(imgs):
+        if i >= 9:
+            break
+        plt.subplot(2, 9, i+1)
+        item = item.reshape(-1, 28, 28)
+        plt.imshow(item[0])
+
+    for i, item in enumerate(recon):
+        if i >= 9:
+            break
+        plt.subplot(2, 9, 9+i+1)
+        item = item.reshape(-1, 28, 28)
+        plt.imshow(item[0])
+
+
+plt.show()
