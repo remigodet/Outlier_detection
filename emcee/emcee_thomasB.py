@@ -16,12 +16,12 @@ import numpy as np
 
 def MCMC(func):
     number_of_dimensions = 28*28
-    number_of_walkers = 1
+    number_of_walkers = 100
     initial_states = np.random.randn(
-        number_of_walkers, number_of_dimensions)/10
+        number_of_walkers, number_of_dimensions)
     sampler = emcee.EnsembleSampler(
         nwalkers=number_of_walkers, ndim=number_of_dimensions, log_prob_fn=func)
-    sampler.run_mcmc(initial_state=initial_states, nsteps=100)
+    sampler.run_mcmc(initial_state=initial_states, nsteps=50)
     samples = sampler.get_chain(flat=True)
     return samples
 
