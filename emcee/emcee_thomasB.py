@@ -1,6 +1,8 @@
 
 
+from locale import DAY_1
 from turtle import forward
+from h11 import Data
 from matplotlib import pyplot as plt
 from matplotlib.transforms import Transform
 import torch
@@ -10,6 +12,19 @@ from torchvision import datasets, transforms
 import matplotlib.pyplot as plt
 import emcee
 import numpy as np
+
+
+def MCMC(func):
+    number_of_dimensions = 28*28
+    number_of_walkers = 1
+    initial_states = np.random.randn(
+        number_of_walkers, number_of_dimensions)/10
+    sampler = emcee.EnsembleSampler(
+        nwalkers=number_of_walkers, ndim=number_of_dimensions, log_prob_fn=func)
+    sampler.run_mcmc(initial_state=initial_states, nsteps=100)
+    samples = sampler.get_chain(flat=True)
+    return samples
+
 
 transform = transforms.ToTensor()
 
@@ -47,20 +62,13 @@ for epoch in range(num_epochs):
         img = img.reshape(-1, 28*28)
         recon = model(img)
         loss = criteron(recon, img)
-
+        data_MCMC = MCMC(loss)
+        recon_MCMC = model(data_MCMC)
+        loss_neg = criteron(data_MCMC, recon_MCMC)
+        loss = loss + loss_neg
         optimizer.zero_grad()
         loss.backward()
         optimizer.step()
 
     print(f'Epoch: {epoch+1}, Loss: {loss.item() : 4f}')
     outputs.append((epoch, img, recon))
-
-
-def MCMC(func):
-    number_of_dimensions = 28*28
-    number_of_walkers = 10
-    initial_states = np.random.randn(number_of_walkers, number_of_dimensions)
-    sampler = emcee.EnsembleSampler(
-        nwalkers=number_of_walkers, ndim=number_of_dimensions, log_prob_fn=func)
-    sampler.run_mcmc(initial_state=initial_states, nsteps=10000)
-    samples = sampler.get_chain(flat=True)
