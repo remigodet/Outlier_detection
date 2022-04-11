@@ -16,7 +16,7 @@ mnist_testset = datasets.MNIST(
 # holdout
 indexes = []
 neg_indexes = []
-held_digits = [4]  # changes batch size !
+held_digits = [1]  # changes batch size !
 for i in range(len(mnist_trainset)):
     if mnist_trainset[i][1] not in held_digits:
         indexes.append(i)
@@ -33,9 +33,9 @@ mnist_trainset_neg = torch.utils.data.Subset(
 # dataloaders
 # train
 pos_trainloader = torch.utils.data.DataLoader(
-    mnist_trainset_pos, batch_size=900)
+    mnist_trainset_pos, batch_size=90)
 neg_trainloader = torch.utils.data.DataLoader(
-    mnist_trainset_neg, batch_size=50)
+    mnist_trainset_neg, batch_size=5)
 # test -- all digits
 testloader = torch.utils.data.DataLoader(mnist_testset, batch_size=50)
 
@@ -152,7 +152,7 @@ def train(epoch):
         # computing final loss ===================
         # *gamma*
         # gamma = i*0.05/940
-        gamma = 0.031
+        gamma = 0.01
         loss_train = pos_loss_train - gamma*neg_loss_train
         # computing the updated weights of all the model parameters
         loss_train.backward()
@@ -178,7 +178,7 @@ with torch.no_grad():
     # plt.legend()
     # plt.show()
 
-    for j, (images, labels) in enumerate(testloader):
+    for j, (images, labels) in enumerate(neg_trainloader):
 
         # getting the test images
         x_test, y_test = Variable(images), Variable(labels)
@@ -195,6 +195,7 @@ with torch.no_grad():
                 x_test[images[i]].cpu().permute(1, 2, 0)))  # pfff
             plt.title(y_test[images[i]].cpu().detach().numpy())  # mdr c quoi
             plt.subplot(NB, 2, 2*i+2)
+            plt.title(criterion(x_test[images[i]], y_pred[images[i]]))
             plt.imshow(np.squeeze(y_pred[images[i]].cpu().permute(1, 2, 0)))
         plt.show()
         if j == 4:
