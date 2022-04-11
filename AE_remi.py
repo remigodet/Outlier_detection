@@ -134,8 +134,9 @@ with torch.no_grad():
     # plt.legend()
     # plt.show()
 
-    for i, (images, labels) in enumerate(testloader[:4]):
-
+    for i, (images, labels) in enumerate(testloader):
+        if i == 4:
+            break
         # getting the test images
         x_test, y_test = Variable(images), Variable(labels)
         if torch.cuda.is_available():
