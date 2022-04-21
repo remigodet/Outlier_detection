@@ -1,6 +1,7 @@
 # ignored files
 /data
-/models
+/saved_models
+
 
 
 # Byte-compiled / optimized / DLL files
