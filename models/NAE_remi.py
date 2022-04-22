@@ -414,21 +414,21 @@ if __name__ == '__main__':
     # # new NAE
     held_digit = 3
     model = train_model(held_digit)
-    torch.save(model, "models/model3.pth")  # gets stuck >< whyyyy
+    torch.save(model, "saved_models/model3.pth")  # gets stuck >< whyyyy
 
     # plot
     models = []
-    models.append((torch.load("models/model0.pth"), "model0"))
-    models.append((torch.load("models/model1.pth"), "model1"))
-    models.append((torch.load("models/model3.pth"), "model3"))
-    models.append((torch.load("models/model5.pth"), "model5"))
-    models.append((torch.load("models/model6.pth"), "model6"))
-    models.append((torch.load("models/model8.pth"), "model8"))
-    models.append((torch.load("models/model9.pth"), "model9"))
+    models.append((torch.load("saved_models/model0.pth"), "model0"))
+    models.append((torch.load("saved_models/model1.pth"), "model1"))
+    models.append((torch.load("saved_models/model3.pth"), "model3"))
+    models.append((torch.load("saved_models/model5.pth"), "model5"))
+    models.append((torch.load("saved_models/model6.pth"), "model6"))
+    models.append((torch.load("saved_models/model8.pth"), "model8"))
+    models.append((torch.load("saved_models/model9.pth"), "model9"))
 
     # mcmc_out_of_model(model) # samples model a posteriori
     # plots images vs reconstruction
-    visu_model(torch.load("models/model8.pth"))
+    visu_model(torch.load("saved_models/model8.pth"))
     results(models)
 
     print("all done !")
