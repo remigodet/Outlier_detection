@@ -20,6 +20,7 @@ def visu(params, dataloader, model):
 # def get_detector ?
 
     held_digits = params['outliers']
+    visu_choice = params['visu_choice']
 
     L = []
     for (image,label) in dataloader:
@@ -38,8 +39,6 @@ def visu(params, dataloader, model):
             nb_fake_pos += 1
         else:
             nb_true_pos += 1
-
-
 
     Total=len(L)
 
