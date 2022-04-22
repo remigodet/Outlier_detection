@@ -15,12 +15,15 @@ def get_data(params):
     # TODO try and except error to see if data is adequate
     # NB should be independant from the datatype ? like if we use timeseries later
     # the only change should be to data.py
-    raise NotImplementedError("get_data")
+
+    # ajouter un paramètre pour savoir si on veut train ou test
+    from data import data
+    return data(params)
 
 
 def get_model(params):
     # get the saved model from saved_models (file in .pth)
-    # to get the model pass a string linked to the saved model file 
+    # to get the model pass a string linked to the saved model file
     # refer to README.md for nomenclature
     # TODO implement it !
     # TODO try and except error to see if model works with the data format
