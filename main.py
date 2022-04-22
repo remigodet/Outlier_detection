@@ -40,7 +40,7 @@ def visualize(params: dict, dataloader, model):
     # TODO : implement for 1 model
     # TODO : for more than 1 models
     # TODO : getting out a criterion function automatically + uncertainty on it based on results
-    token = visu
+    token = visu(params)
     # TODO check results
     # TODO visu returns a criterion (boolean classifier) to use
     return token
