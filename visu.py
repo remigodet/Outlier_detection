@@ -20,6 +20,7 @@ def visu(params, dataloader, model):
 # def get_detector ?
 
     held_digits = params['outliers']
+    visu_choice = params['visu_choice']
 
     L = []
     for (image,label) in dataloader:

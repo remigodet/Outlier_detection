@@ -20,4 +20,5 @@ ex : AE_leo-17-0001.pth
 "dataset" : "train" or "test" est le dataset d'ou tirer les images
 "batch_size" : int the length of the dataset batches
 "outliers" : list of ints 
+"visu_choice" : str name of the choice of visualization
 "use_negative_index" : bool for the naive algorithm
