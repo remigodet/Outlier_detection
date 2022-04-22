@@ -1,6 +1,6 @@
 # ignored files
 /data
-/saved_models
+/saved_models/*.pth
 
 
 
