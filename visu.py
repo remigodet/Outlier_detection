@@ -40,8 +40,6 @@ def visu(params, dataloader, model):
         else:
             nb_true_pos += 1
 
-
-
     Total=len(L)
 
     Fake_pos = []
