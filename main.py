@@ -7,6 +7,9 @@
 # 1.3: training of new models on the go with function train_model ...
 # 1.4: interface ?
 
+# imports
+import torch
+
 
 def get_data(params):
     # get the dataloader (PyTorch object) from data.py
@@ -18,14 +21,16 @@ def get_data(params):
     raise NotImplementedError("get_data")
 
 
-def get_model(params):
-    # get the saved model from saved_models (file in .pth)
-    # to get the model pass a string linked to the saved model file 
-    # refer to README.md for nomenclature
-    # TODO implement it !
+def get_model(name: str):
+    '''
+    :name: nomenclature of model ex: AE_leo-17-0001.pth
+    '''
+    # get the saved model from saved_models (file in .pth
+    # refer to README.md for nomenclature of the name
+
     # TODO try and except error to see if model works with the data format
-    from models.algo_example import load
-    raise NotImplementedError("get_model")
+    model = torch.load("saved_models\{}")
+    return model
 
 
 def visualize(params, model):
