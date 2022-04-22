@@ -7,8 +7,12 @@
 # 1.3: training of new models on the go with function train_model ...
 # 1.4: interface ?
 
+# imports
+import torch
+from visu import visu
 
-def get_data(params):
+
+def get_data(params: dict):
     # get the dataloader (PyTorch object) from data.py
     # params : test/train/validation sets and how to slice them ; random=42 etc, batches of number, lengths ...
     # TODO implement it !
@@ -21,28 +25,47 @@ def get_data(params):
     return data(params)
 
 
-def get_model(params):
-    # get the saved model from saved_models (file in .pth)
-    # to get the model pass a string linked to the saved model file
-    # refer to README.md for nomenclature
-    # TODO implement it !
+def get_model(params: dict):
+    '''
+    :name: nomenclature of model ex: AE_leo-17-0001.pth
+    '''
+    # get the saved model from saved_models (file in .pth
+    # refer to README.md for nomenclature of the name
+
     # TODO try and except error to see if model works with the data format
-    from models.algo_example import load
-    raise NotImplementedError("get_model")
+    model = torch.load("saved_models\{}")
+    return model
 
 
-def visualize(params, model):
+def visualize(params: dict, dataloader, model):
     # use the choice of visualisation for the model(s) selected and the data selected as true/false
-    # TODO : implement for 1 model & check results
+    # params dico : model name for plotting, what metrics to compute, plot mcmc etc ?
+    # TODO : implement for 1 model
     # TODO : for more than 1 models
     # TODO : getting out a criterion function automatically + uncertainty on it based on results
-    raise NotImplementedError("visualize")
+    token = visu
+    # TODO check results
+    # TODO visu returns a criterion (boolean classifier) to use
+    return token
 
 
-def main(params):
+def main(params: dict):
     # sequence of action
-    raise NotImplementedError("main")
+    loader = get_data(params)
+    print("data loaded")
+    model = get_model(params)
+    print("model loaded")
+    results = visualize(params, loader, model)
+    print("all done")
+    return results
 
 
 if __name__ == "__main__":
-    main()
+    # construct dict with console
+    # what to put in dict ?
+    # refer to each function in main
+    params = {}  # TODO a file to make sure we all have the same ?
+    model_name = input("model_name")
+    params["dataset"] = "test"  # "train" for training
+    params["model_name"] = model_name
+    main(params)
