@@ -9,6 +9,7 @@
 
 # imports
 import torch
+from visu import visu
 
 
 def get_data(params):
@@ -33,12 +34,16 @@ def get_model(name: str):
     return model
 
 
-def visualize(params, model):
+def visualize(params, dataloader, model):
     # use the choice of visualisation for the model(s) selected and the data selected as true/false
-    # TODO : implement for 1 model & check results
+    # params dico : model name for plotting, what metrics to compute, plot mcmc etc ?
+    # TODO : implement for 1 model
     # TODO : for more than 1 models
     # TODO : getting out a criterion function automatically + uncertainty on it based on results
-    raise NotImplementedError("visualize")
+    token = visu
+    # TODO check results
+    # TODO visu returns a criterion (boolean classifier) to use
+    return token
 
 
 def main(params):
