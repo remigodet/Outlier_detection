@@ -223,7 +223,7 @@ def train_model(held_digit):
     mnist_testset = datasets.MNIST(
         root='./data', train=False, download=True, transform=ToTensor())
 
-    # holdout #5000 images
+    # holdout
     indexes = []
     neg_indexes = []
     held_digits = [held_digit]  # changes batch size !
