@@ -1,13 +1,3 @@
-# tools for testing trained models perfs and creating an optimal outlier detector
-
-# function to be determined ...
-
-# def visu(params)
-#   params are the type of results
-#   plot ?
-
-# def get_detector ?
-
 from cmath import sqrt
 import numpy as np
 import torch
@@ -189,3 +179,8 @@ for tau in T:
 plt.figure()
 plt.plot(Fake_pos,True_pos)
 plt.show() 
+
+
+
+
+
