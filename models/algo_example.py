@@ -15,6 +15,7 @@ if __name__ == "__main__":
 
     # torch func to save& load
     # torch.save(model, "saved_models/NAME.pth")
+    # refer to README.md for nomenclature !!!!!!!!!!!
     # torch.load("saved_models/NAME.pth")
 
     raise NotImplementedError("please train your model")

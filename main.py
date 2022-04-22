@@ -19,7 +19,9 @@ def get_data(params):
 
 
 def get_model(params):
-    # get the saved model from models.MODEL_XX.py module$
+    # get the saved model from saved_models (file in .pth)
+    # to get the model pass a string linked to the saved model file 
+    # refer to README.md for nomenclature
     # TODO implement it !
     # TODO try and except error to see if model works with the data format
     from models.algo_example import load
