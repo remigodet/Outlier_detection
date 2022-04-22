@@ -12,7 +12,7 @@ import torch
 from visu import visu
 
 
-def get_data(params):
+def get_data(params: dict):
     # get the dataloader (PyTorch object) from data.py
     # params : test/train/validation sets and how to slice them ; random=42 etc, batches of number, lengths ...
     # TODO implement it !
@@ -22,7 +22,7 @@ def get_data(params):
     raise NotImplementedError("get_data")
 
 
-def get_model(name: str):
+def get_model(params: dict):
     '''
     :name: nomenclature of model ex: AE_leo-17-0001.pth
     '''
@@ -34,7 +34,7 @@ def get_model(name: str):
     return model
 
 
-def visualize(params, dataloader, model):
+def visualize(params: dict, dataloader, model):
     # use the choice of visualisation for the model(s) selected and the data selected as true/false
     # params dico : model name for plotting, what metrics to compute, plot mcmc etc ?
     # TODO : implement for 1 model
@@ -46,10 +46,23 @@ def visualize(params, dataloader, model):
     return token
 
 
-def main(params):
+def main(params: dict):
     # sequence of action
-    raise NotImplementedError("main")
+    loader = get_data(params)
+    print("data loaded")
+    model = get_model(params)
+    print("model loaded")
+    results = visualize(params, dataloader, model)
+    print("all done")
+    return results
 
 
 if __name__ == "__main__":
-    main()
+    # construct dict with console
+    # what to put in dict ?
+    # refer to each function in main
+    params = {}
+    model_name = input("model_name")
+    params["dataset"] = "test"  # "train" for training
+    params["model_name"] = model_name
+    main(params)
