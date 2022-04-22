@@ -61,7 +61,7 @@ if __name__ == "__main__":
     # construct dict with console
     # what to put in dict ?
     # refer to each function in main
-    params = {}
+    params = {}  # TODO a file to make sure we all have the same ?
     model_name = input("model_name")
     params["dataset"] = "test"  # "train" for training
     params["model_name"] = model_name
