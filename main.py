@@ -33,7 +33,7 @@ def get_model(params: dict):
     # refer to README.md for nomenclature of the name
 
     # TODO try and except error to see if model works with the data format
-    model = torch.load("saved_models\{}")
+    model = torch.load("saved_models\{}".format(params["model_name"]))
     return model
 
 
