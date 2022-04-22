@@ -15,20 +15,19 @@ mnist_testset = datasets.MNIST(
 
 # holdout
 indexes = []
-held_digits = [4]  # changes batch size !
+held_digits = [1, 7]
 for i in range(len(mnist_trainset)):
     if mnist_trainset[i][1] not in held_digits:
         indexes.append(i)
+# print(len(indexes)/len(mnist_trainset))
 
 # torch.utils.data.Subset(trainset, idx)
-mnist_trainset_pos = torch.utils.data.Subset(
+mnist_trainset_holdout = torch.utils.data.Subset(
     mnist_trainset, indexes)
 
-# dataloaders
-# train
-pos_trainloader = torch.utils.data.DataLoader(
-    mnist_trainset_pos, batch_size=1000)
-# test -- all digits
+# dataloader
+trainloader = torch.utils.data.DataLoader(
+    mnist_trainset_holdout, batch_size=50)
 testloader = torch.utils.data.DataLoader(mnist_testset, batch_size=50)
 
 
@@ -57,20 +56,10 @@ class Net(nn.Module):
             nn.ReLU(inplace=True),
             nn.Upsample(scale_factor=2),
             # Defining second 2D upscaling layer
-            nn.ConvTranspose2d(4, 4, kernel_size=3, stride=1, padding=1),
-            nn.BatchNorm2d(4),
-            nn.ReLU(inplace=True),
-            nn.Upsample(scale_factor=2),
-
-            nn.ConvTranspose2d(4, 4, kernel_size=3, stride=1, padding=1),
-            nn.BatchNorm2d(4),
-            nn.ReLU(inplace=True),
-            nn.Upsample(scale_factor=2),
-
-            nn.Conv2d(4, 1, kernel_size=3, stride=1, padding=1),
+            nn.ConvTranspose2d(4, 1, kernel_size=3, stride=1, padding=1),
             nn.BatchNorm2d(1),
             nn.ReLU(inplace=True),
-            nn.MaxPool2d(kernel_size=2, stride=2)
+            nn.Upsample(scale_factor=2)
         )
 
         # Defining the forward pass
@@ -85,7 +74,7 @@ class Net(nn.Module):
 # defining the model
 model = Net()
 # defining the optimizer
-optimizer = torch.optim.Adam(model.parameters(), lr=0.08)
+optimizer = torch.optim.Adam(model.parameters(), lr=0.07)
 # defining the loss function
 # criterion = nn.CrossEntropyLoss() # for CNN
 criterion = nn.MSELoss()  # for autoencoder
@@ -101,66 +90,33 @@ def train(epoch):
 
     model.train()
     tr_loss = 0
-    for i, (images, labels) in enumerate(pos_trainloader):
-        # one batch
+    for i, (images, labels) in enumerate(trainloader):
+        # getting the training set
+        x_train, y_train = Variable(images), Variable(labels)
+        y_train = x_train  # images are ground truth
+
+        # converting the data into GPU format
+        if torch.cuda.is_available():
+            x_train = x_train.cuda()
+            y_train = y_train.cuda()
+
         # clearing the Gradients of the model parameters
         optimizer.zero_grad()
-        # pos =================================================================
-        # getting the pos training set
-        x_train, y_train = Variable(images), Variable(labels)
-        y_train = x_train  # images are ground truth
 
-        # converting the data into GPU format
-        if torch.cuda.is_available():
-            x_train = x_train.cuda()
-            y_train = y_train.cuda()
-
-        # prediction for training and validation set
-        output_train = model(x_train)
-
-        # computing the training loss for pos samples
-        pos_loss_train = criterion(output_train, y_train)
-
-        # =========================================================
-        # neg
-        # print(iter(neg_trainloader))
-        # next item of iterator made from torch dataloader
-        def neg_samples_MCMC(F, n=1000):
-            F to energy
-
-            for n*10
-            mcmc
-            cut to 1000
-
-            energy to
-
-        item = neg_samples_MCMC(F, n=1000)
-        (images, labels) = item
-        # getting the pos training set
-        x_train, y_train = Variable(images), Variable(labels)
-        y_train = x_train  # images are ground truth
-        # converting the data into GPU format
-        if torch.cuda.is_available():
-            x_train = x_train.cuda()
-            y_train = y_train.cuda()
         # prediction for training and validation set
         output_train = model(x_train)
 
         # computing the training loss
-        neg_loss_train = criterion(output_train, y_train)
+        loss_train = criterion(output_train, y_train)
+        train_losses.append(loss_train.cpu())
 
-        # computing final loss ===================
-        # *gamma*
-        # gamma = i*0.05/940
-        gamma = 0.031
-        loss_train = pos_loss_train - gamma*neg_loss_train
         # computing the updated weights of all the model parameters
         loss_train.backward()
         optimizer.step()
         tr_loss = loss_train.item()
-
-    print('Epoch : ', epoch+1, '\t', 'loss :',
-          loss_train)
+    if epoch % 2 == 0:
+        # printing the validation loss
+        print('Epoch : ', epoch+1, '\t', 'loss :', loss_train)
 
 
 # defining the number of epochs
@@ -178,8 +134,9 @@ with torch.no_grad():
     # plt.legend()
     # plt.show()
 
-    for j, (images, labels) in enumerate(testloader):
-
+    for i, (images, labels) in enumerate(testloader):
+        if i == 4:
+            break
         # getting the test images
         x_test, y_test = Variable(images), Variable(labels)
         if torch.cuda.is_available():
@@ -197,6 +154,5 @@ with torch.no_grad():
             plt.subplot(NB, 2, 2*i+2)
             plt.imshow(np.squeeze(y_pred[images[i]].cpu().permute(1, 2, 0)))
         plt.show()
-        if j == 4:
-            break
+
         # print(type(y_pred))

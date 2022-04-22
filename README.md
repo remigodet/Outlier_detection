@@ -2,7 +2,15 @@
 
 
 
-
+# nomenclature des modules pour entraîner les models
 AE_X : autoencoder vanilla made by X
 naive_X : AE with negative loss for heldout digits made by X
 NAE_X : AE with search for negative samples using MCMC made by X
+
+# nomenclature des modèles enregistrés .pth
+nom du module
+outliers
+index - get the info of the model in saved_models/model_info.txt index close to line number is best!
+
+nomenclature : modulename-outliers-index.pth
+ex : AE_leo-17-0001.pth

@@ -9,9 +9,8 @@ import emcee
 import numpy as np
 
 
-def MCMC(func):
+def MCMC(img, func):
 
-    img = [0]*28*28
     pos = img + np.random.randn(28*28*2, 28*28)
     number_of_walkers, number_of_dimensions = pos.shape
 
@@ -37,9 +36,6 @@ mnist_data = datasets.MNIST(root='./data', download=True, transform=transform)
 data_loader = torch.utils.data.DataLoader(
     dataset=mnist_data, batch_size=500, shuffle=True)
 
-dataiter = iter(data_loader)
-images, labels = dataiter.next()
-
 
 class Autoencodeur(nn.Module):
     def __init__(self):
@@ -57,7 +53,7 @@ class Autoencodeur(nn.Module):
 
 model = Autoencodeur()
 criteron = nn.MSELoss()
-optimizer = optim.Adam(model.parameters(), lr=1e-2, weight_decay=1e-5)
+optimizer = optim.Adam(model.parameters(), lr=1e-2)
 
 num_epochs = 10
 outputs = []
@@ -74,8 +70,27 @@ for epoch in range(num_epochs):
     outputs.append((epoch, img, recon))
 
 with torch.no_grad():
+    dataiter = iter(data_loader)
+    target_label = 2  # CHOOSE IMAGE NUMBER TO TARGET VIA MCMC
+    # "zero" for initial state @ zero array
+    # "rd" for random initial states
+
+    if target_label == "zero":
+        image = [0]*28*28
+    elif target_label == "rd":
+        image = [0]*28*28 + np.random.rand(28*28)
+    else:
+        image, label = dataiter.next()
+        print(label.shape)
+        for j in range(len(image)):
+            if label[j] == target_label:
+                image = image[j]
+                label = label[j].item()
+                break
+        print(label)
+
     def func(x): return criteron(model(x), x)
-    res_MCMC = MCMC(func)
+    res_MCMC = MCMC(image.reshape(28*28), func)
 
 
 # VISU
@@ -97,8 +112,10 @@ with torch.no_grad():
 #         plt.subplot(2, 9, 9+i+1)
 #         item = item.reshape(-1, 28, 28)
 #         plt.imshow(item[0])
+plt.title(label)
 for i in range(3):
     for j in range(3):
         plt.subplot(3, 3, 1+i+3*j)
         plt.imshow(res_MCMC[i+3*j].reshape(28, 28))
+
 plt.show()

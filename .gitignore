@@ -1,3 +1,9 @@
+# ignored files
+/data
+/saved_models/*.pth
+
+
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
