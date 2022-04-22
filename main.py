@@ -22,6 +22,7 @@ def get_model(params):
     # get the saved model from models.MODEL_XX.py module$
     # TODO implement it !
     # TODO try and except error to see if model works with the data format
+    from models.algo_example import load
     raise NotImplementedError("get_model")
 
 
