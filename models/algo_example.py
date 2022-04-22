@@ -1,11 +1,4 @@
-# a typical module template fro training and loading a model
-
-
-def load():
-    # loading model in main.py with torch.load()
-    # return a functional model : please test
-    raise NotImplementedError("please define the loading function")
-
+# a typical module template fro training and saving a model
 
 if __name__ == "__main__":
     # training
@@ -15,6 +8,7 @@ if __name__ == "__main__":
 
     # torch func to save& load
     # torch.save(model, "saved_models/NAME.pth")
+    # refer to README.md for nomenclature !!!!!!!!!!!
     # torch.load("saved_models/NAME.pth")
 
     raise NotImplementedError("please train your model")
