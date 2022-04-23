@@ -14,3 +14,11 @@ index - get the info of the model in saved_models/model_info.txt index close to 
 
 nomenclature : modulename-outliers-index.pth
 ex : AE_leo-17-0001.pth
+
+# params KESAKO
+"model_name" : str name of the model to load
+"dataset" : "train" or "test" est le dataset d'ou tirer les images
+"batch_size" : int the length of the dataset batches
+"outliers" : list of ints 
+"visu_choice" : str name of the choice of visualization
+"use_negative_index" : bool for the naive algorithm

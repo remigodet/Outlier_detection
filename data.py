@@ -6,7 +6,7 @@ import torch
 
 def data(params):
     # returns list of dataloaders where each one is described in params ex:length, numbers allowed, ect
-    # to be used in main.py
+    # to be used in main.py and in training
     # please test
 
     # Parameters default value

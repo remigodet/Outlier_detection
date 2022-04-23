@@ -33,7 +33,7 @@ def get_model(params: dict):
     # refer to README.md for nomenclature of the name
 
     # TODO try and except error to see if model works with the data format
-    model = torch.load("saved_models\{}")
+    model = torch.load("saved_models\{}".format(params["model_name"]))
     return model
 
 
@@ -43,7 +43,7 @@ def visualize(params: dict, dataloader, model):
     # TODO : implement for 1 model
     # TODO : for more than 1 models
     # TODO : getting out a criterion function automatically + uncertainty on it based on results
-    token = visu
+    token = visu(params)
     # TODO check results
     # TODO visu returns a criterion (boolean classifier) to use
     return token
