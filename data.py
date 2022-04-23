@@ -21,7 +21,7 @@ def data(params):
         outliers = params['outliers']
     if 'dataset' in params:
         dataset = params['dataset']
-    if 'use_negative' not in params:
+    if 'use_negative' in params:
         # If True renvoie le tuple des images à indexs positifs et négatifs
         use_negative_index = params['use_negative_index']
 
