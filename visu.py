@@ -12,7 +12,9 @@ from torchvision.datasets import MNIST
 import matplotlib.pyplot as plt
 from torchvision.transforms import ToTensor
 import math as m
-
+import time 
+import time
+import sys
 
 def visu(params, dataloader, models):
 #   params are the type of results
@@ -37,7 +39,6 @@ def visu(params, dataloader, models):
 
     else :
         print("visu_choice has to be either roc or tab")
-
 
 
 
@@ -81,6 +82,15 @@ def affichage_roc(held_digits, dataloader, model, choice):
         aire += (x2 - x1) * (y2 + y1) / 2
         x1, y1 = x2, y2
         s += 1
+        sys.stdout.write('\rloading |  {}/{}'.format(s, len(T)))
+        time.sleep(0.001)
+        sys.stdout.write('\rloading /  {}/{}'.format(s, len(T)))
+        time.sleep(0.001)
+        sys.stdout.write('\rloading -  {}/{}'.format(s, len(T)) )
+        time.sleep(0.001)
+        sys.stdout.write('\rloading \\  {}/{}'.format(s, len(T)))
+        time.sleep(0.001)
+    sys.stdout.write('\rDone!     ')
 
 
     if choice == "roc":

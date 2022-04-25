@@ -1,3 +1,4 @@
+from unittest import TestLoader
 import visu as visu
 import numpy as np                       
 import torch                       
@@ -12,10 +13,15 @@ from models.AE_Thomas_dMdP import Autoencoder
 
 
 
-
-
-
+params = {'outliers':[0], 'visu_choice': 'roc'}
 
 model = torch.load('./saved_models/AE_ThomasdMdP.pth')
 
+mnist_testset = torchvision.datasets.MNIST(
+    root='./data', train=False, download=True, transform=torchvision.transforms.ToTensor())
+
+dataloader = torch.utils.data.DataLoader(mnist_testset, batch_size=50)
+
+
+visu.visu(params,dataloader,[model])
 
