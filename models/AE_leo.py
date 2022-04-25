@@ -41,7 +41,7 @@ trainloader = torch.utils.data.DataLoader(
     mnist_trainset_holdout, batch_size=50)
 testloader = torch.utils.data.DataLoader(mnist_testset, batch_size=50)
 
-class autoencoder(nn.Module):
+class Autoencoder(nn.Module):
     def __init__(self):
         super().__init__()
           
