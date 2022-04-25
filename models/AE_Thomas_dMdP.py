@@ -73,8 +73,8 @@ class Autoencoder(nn.Module):
                   .format(epoch + 1, self.epochs, loss.data))
 
 
-model = Autoencoder()
+'''model = Autoencoder()
 model.trainModel()
 
 
-torch.save(model,'AE_ThomasdMdP.pth')
+torch.save(model,'AE_ThomasdMdP.pth')'''
