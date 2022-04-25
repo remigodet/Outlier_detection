@@ -85,7 +85,9 @@ def affichage_roc(held_digits, dataloader, model, choice):
 
     if choice == "roc":
         plt.figure()
-        plt.plot(Fake_pos,True_pos)
+        plt.plot(Fake_pos,True_pos, label = 'evaluation')
+        plt.plot([0,1],[0,1], label = "no skill")
+        plt.legend()
         plt.show() 
 
     if choice == "tab":
