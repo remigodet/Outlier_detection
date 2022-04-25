@@ -10,6 +10,8 @@
 # imports
 import torch
 from visu import visu
+from models.AE_thomasB import Autoencoder
+from models.AE_remi import Net
 
 
 def get_data(params: dict):
@@ -34,14 +36,25 @@ def get_models(params: dict):
     # refer to README.md for nomenclature of the name
 
     # TODO try and except error to see if model works with the data format
-    if params['visu_choice'] == "roc" :
-        model = torch.load("saved_models\{}".format(params["model_name"]))
+    model_name = params['model_name'].split('-')[0]
+    print(params['model_name'], model_name)
+    if model_name == 'NAE_remi':
+        exec('from models.{} import Net'.format(model_name))
+    else:
+        exec('from models.{} import Autoencoder'.format(model_name))
+
+    if params['visu_choice'] == "roc":
+        model = torch.load("saved_models/{}".format(params['model_name']))
         return [model]
-    if params['visu_choice'] == "tab" :
+    if params['visu_choice'] == "tab":
         models = []
         for i in range(10):
-            model = torch.load("saved_models\{}".format(params["model_name"+"-"+str(i)+"-"+params['model_index']]))
-            models.append(model)
+            try:
+                model = torch.load("saved_models\{}".format(
+                    model_name+"-"+str(i)+"-"+params['model_index']+'.pth'))
+                models.append(model)
+            except:
+                print('Fail to load '+str(i))
         return models
 
 
@@ -51,7 +64,7 @@ def visualize(params: dict, dataloader, models):
     # TODO : implement for 1 model
     # TODO : for more than 1 models
     # TODO : getting out a criterion function automatically + uncertainty on it based on results
-    token = visu(params)
+    token = visu(params, dataloader, models)
     # TODO check results
     # TODO visu returns a criterion (boolean classifier) to use
     return token
@@ -77,13 +90,13 @@ if __name__ == "__main__":
     params["dataset"] = "test"  # "train" for training
     params['visu_choice'] = visu_choice
 
-    if visu_choice == "roc":    
+    if visu_choice == "roc":
         model_name = input("model_name")
-        params['outliers'] = list(int(input('outliers')))
-    if visu_choice == "tab": 
+        params['outliers'] = [int(input('outliers'))]
+    if visu_choice == "tab":
         model_name = input('models_name')
         model_index = input('models_index')
+        params["model_index"] = model_index
     params["model_name"] = model_name
-    params["model_index"] = model_index
 
     main(params)
