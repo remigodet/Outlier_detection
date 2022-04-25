@@ -9,6 +9,7 @@
 
 # imports
 import torch
+from models.AE_thomasB import Autoencoder
 from visu import visu
 
 
@@ -33,7 +34,12 @@ def get_model(params: dict):
     # refer to README.md for nomenclature of the name
 
     # TODO try and except error to see if model works with the data format
-    model = torch.load("saved_models\{}".format(params["model_name"]))
+    model_name = params['model_name'].split('-')[0]
+    print(model_name)
+    print(params["model_name"])
+    exec('from models.{} import Autoencoder'.format(model_name))
+
+    model = torch.load("saved_models/{}".format(params["model_name"]))
     return model
 
 

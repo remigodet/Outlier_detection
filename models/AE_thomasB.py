@@ -21,7 +21,7 @@ dataiter = iter(data_loader)
 images, labels = dataiter.next()
 
 
-class Autoencodeur(nn.Module):
+class Autoencoder(nn.Module):
     def __init__(self):
         super().__init__()
         self.encoder = nn.Sequential(nn.Linear(28*28, 128), nn.ReLU(), nn.Linear(
@@ -35,47 +35,47 @@ class Autoencodeur(nn.Module):
         return decoded
 
 
-model = Autoencodeur()
-criteron = nn.MSELoss()
-optimizer = optim.Adam(model.parameters(), lr=1e-2, weight_decay=1e-5)
+if __name__ == '__main__':
 
-num_epochs = 10
-outputs = []
-for epoch in range(num_epochs):
-    for (img, _) in data_loader:
-        img = img.reshape(-1, 28*28)
-        recon = model(img)
-        loss = criteron(recon, img)
+    model = Autoencoder()
+    criteron = nn.MSELoss()
+    optimizer = optim.Adam(model.parameters(), lr=1e-2, weight_decay=1e-5)
 
-        optimizer.zero_grad()
-        loss.backward()
-        optimizer.step()
+    num_epochs = 10
+    outputs = []
+    for epoch in range(num_epochs):
+        for (img, _) in data_loader:
+            img = img.reshape(-1, 28*28)
+            recon = model(img)
+            loss = criteron(recon, img)
 
-    print(f'Epoch: {epoch+1}, Loss: {loss.item() : 4f}')
-    outputs.append((epoch, img, recon))
+            optimizer.zero_grad()
+            loss.backward()
+            optimizer.step()
 
+        print(f'Epoch: {epoch+1}, Loss: {loss.item() : 4f}')
+        outputs.append((epoch, img, recon))
 
-for k in range(0, num_epochs, 4):
-    plt.figure(figsize=(9, 2))
-    plt.gray()
-    imgs = outputs[k][1].detach().numpy()
-    recon = outputs[k][2].detach().numpy()
-    for i, item in enumerate(imgs):
-        if i >= 9:
-            break
-        plt.subplot(2, 9, i+1)
-        item = item.reshape(-1, 28, 28)
-        plt.imshow(item[0])
+    for k in range(0, num_epochs, 4):
+        plt.figure(figsize=(9, 2))
+        plt.gray()
+        imgs = outputs[k][1].detach().numpy()
+        recon = outputs[k][2].detach().numpy()
+        for i, item in enumerate(imgs):
+            if i >= 9:
+                break
+            plt.subplot(2, 9, i+1)
+            item = item.reshape(-1, 28, 28)
+            plt.imshow(item[0])
 
-    for i, item in enumerate(recon):
-        if i >= 9:
-            break
-        plt.subplot(2, 9, 9+i+1)
-        item = item.reshape(-1, 28, 28)
-        plt.imshow(item[0])
+        for i, item in enumerate(recon):
+            if i >= 9:
+                break
+            plt.subplot(2, 9, 9+i+1)
+            item = item.reshape(-1, 28, 28)
+            plt.imshow(item[0])
 
+    plt.show()
 
-plt.show()
-
-model = Autoencodeur()
-torch.save(model, 'AE_ThomasB-NA-001.pth')
+    model = Autoencoder()
+    torch.save(model, 'AE_thomasB-NA-001.pth')
