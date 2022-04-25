@@ -25,7 +25,7 @@ def visu(params, dataloader, models):
     if visu_choice == "roc":
         affichage_roc(held_digits, dataloader, models[0], "roc")
 
-    if visu_choice == "tab":
+    elif visu_choice == "tab":
         X = range(10)
         Y = []
         for i in range(10):
