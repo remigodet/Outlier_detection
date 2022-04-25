@@ -76,3 +76,6 @@ for k in range(0, num_epochs, 4):
 
 
 plt.show()
+
+model = Autoencodeur()
+torch.save(model, 'AE_ThomasB-NA-001.pth')
