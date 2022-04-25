@@ -79,7 +79,7 @@ if __name__ == "__main__":
 
     if visu_choice == "roc":    
         model_name = input("model_name")
-        params['outliers'] = input('outliers') 
+        params['outliers'] = list(int(input('outliers')))
     if visu_choice == "tab": 
         model_name = input('models_name')
         model_index = input('models_index')
