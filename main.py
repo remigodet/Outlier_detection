@@ -25,19 +25,27 @@ def get_data(params: dict):
     return data(params)
 
 
-def get_model(params: dict):
+def get_models(params: dict):
     '''
     :name: nomenclature of model ex: AE_leo-17-0001.pth
     '''
-    # get the saved model from saved_models (file in .pth
+    # for roc, get the saved model from saved_models (file in .pth
+    # for tab, get the 10 saved models with each digit as an outlier
     # refer to README.md for nomenclature of the name
 
     # TODO try and except error to see if model works with the data format
-    model = torch.load("saved_models\{}".format(params["model_name"]))
-    return model
+    if params['visu_choice'] == "roc" :
+        model = torch.load("saved_models\{}".format(params["model_name"]))
+        return [model]
+    if params['visu_choice'] == "tab" :
+        models = []
+        for i in range(10):
+            model = torch.load("saved_models\{}".format(params["model_name"+"-"+str(i)+"-"+params['model_index']]))
+            models.append(model)
+        return models
 
 
-def visualize(params: dict, dataloader, model):
+def visualize(params: dict, dataloader, models):
     # use the choice of visualisation for the model(s) selected and the data selected as true/false
     # params dico : model name for plotting, what metrics to compute, plot mcmc etc ?
     # TODO : implement for 1 model
@@ -53,9 +61,9 @@ def main(params: dict):
     # sequence of action
     loader = get_data(params)
     print("data loaded")
-    model = get_model(params)
+    models = get_models(params)
     print("model loaded")
-    results = visualize(params, loader, model)
+    results = visualize(params, loader, models)
     print("all done")
     return results
 
@@ -65,7 +73,17 @@ if __name__ == "__main__":
     # what to put in dict ?
     # refer to each function in main
     params = {}  # TODO a file to make sure we all have the same ?
-    model_name = input("model_name")
+    visu_choice = input("choice of visualisation : roc or tab")
     params["dataset"] = "test"  # "train" for training
+    params['visu_choice'] = visu_choice
+
+    if visu_choice == "roc":    
+        model_name = input("model_name")
+        params['outliers'] = input('outliers') 
+    if visu_choice == "tab": 
+        model_name = input('models_name')
+        model_index = input('models_index')
     params["model_name"] = model_name
+    params["model_index"] = model_index
+
     main(params)
