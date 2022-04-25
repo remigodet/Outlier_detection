@@ -9,8 +9,9 @@
 
 # imports
 import torch
-from models.AE_thomasB import Autoencoder
 from visu import visu
+from models.AE_thomasB import Autoencoder
+from models.AE_remi import Net
 
 
 def get_data(params: dict):
@@ -37,7 +38,10 @@ def get_models(params: dict):
     # TODO try and except error to see if model works with the data format
     model_name = params['model_name'].split('-')[0]
     print(params['model_name'], model_name)
-    exec('from models.{} import Autoencoder'.format(model_name))
+    if model_name == 'NAE_remi':
+        exec('from models.{} import Net'.format(model_name))
+    else:
+        exec('from models.{} import Autoencoder'.format(model_name))
 
     if params['visu_choice'] == "roc":
         model = torch.load("saved_models/{}".format(params['model_name']))
