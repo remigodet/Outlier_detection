@@ -9,7 +9,7 @@ from torchvision.datasets import MNIST
 from torchvision.transforms import transforms                       
 from torchvision.utils import save_image
 import matplotlib.pyplot as plt
-from models.AE_Thomas_dMdP import Autoencoder
+from models.AE_ThomasdMdP import Autoencoder
 
 
 
