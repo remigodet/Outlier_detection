@@ -1,1 +1,10 @@
-index               - author                    - describe your model
+totalname               |||  author                     ||| describe your model
+NAE_remi-0-1                 remi                           first batch but better results
+NAE_remi-0-2                 remi                           first batch
+NAE_remi-1-0                 remi                           first batch
+NAE_remi-3-0                 remi                           first batch
+NAE_remi-5-0                 remi                           first batch but better results
+NAE_remi-5-1                 remi                           first batch 
+NAE_remi-6-0                 remi                           first batch
+NAE_remi-8-0                 remi                           first batch
+NAE_remi-9-0                 remi                           first batch
