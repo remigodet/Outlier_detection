@@ -73,7 +73,7 @@ def affichage_roc(held_digits, dataloader, model, choice):
 
     s = 0
     for tau in T:
-        el = visu(tau, held_digits, nb_fake_pos, nb_true_pos, L)
+        el = visualize(tau, held_digits, nb_fake_pos, nb_true_pos, L)
         Fake_pos.append(el[0])
         True_pos.append(el[1])
         x2 = nb_fake_pos
@@ -103,7 +103,7 @@ def dist(im1,im2):
     d = m.sqrt(d)
     return (d)
 
-def visu(tau, held_digits, nb_fake_pos, nb_true_pos, L):
+def visualize(tau, held_digits, nb_fake_pos, nb_true_pos, L):
     fake_pos = 0
     true_pos = 0
     for el in L:
