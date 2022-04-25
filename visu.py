@@ -81,7 +81,6 @@ def affichage_roc(held_digits, dataloader, model, choice):
         aire += (x2 - x1) * (y2 + y1) / 2
         x1, y1 = x2, y2
         s += 1
-        print(s)
 
 
     if choice == "roc":
