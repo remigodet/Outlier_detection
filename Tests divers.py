@@ -16,6 +16,6 @@ from models.AE_Thomas_dMdP import Autoencoder
 
 
 
-model = Autoencoder()
+model = torch.load('./saved_models/AE_ThomasdMdP.pth')
 
-model.load('./saved_models/AE_ThomasdMdP.pth')
+
