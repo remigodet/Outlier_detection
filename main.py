@@ -36,17 +36,18 @@ def get_models(params: dict):
 
     # TODO try and except error to see if model works with the data format
     model_name = params['model_name'].split('-')[0]
+    print(params['model_name'], model_name)
     exec('from models.{} import Autoencoder'.format(model_name))
 
     if params['visu_choice'] == "roc":
-        model = torch.load("saved_models/{}".format(params["model_name"]))
+        model = torch.load("saved_models/{}".format(params['model_name']))
         return [model]
     if params['visu_choice'] == "tab":
         models = []
         for i in range(10):
             try:
                 model = torch.load("saved_models\{}".format(
-                    params["model_name"]+"-"+str(i)+"-"+params['model_index']))
+                    model_name+"-"+str(i)+"-"+params['model_index']+'.pth'))
                 models.append(model)
             except:
                 print('Fail to load '+str(i))
@@ -59,7 +60,7 @@ def visualize(params: dict, dataloader, models):
     # TODO : implement for 1 model
     # TODO : for more than 1 models
     # TODO : getting out a criterion function automatically + uncertainty on it based on results
-    token = visu(params)
+    token = visu(params, dataloader, models)
     # TODO check results
     # TODO visu returns a criterion (boolean classifier) to use
     return token
@@ -87,11 +88,11 @@ if __name__ == "__main__":
 
     if visu_choice == "roc":
         model_name = input("model_name")
-        params['outliers'] = list(int(input('outliers')))
+        params['outliers'] = [int(input('outliers'))]
     if visu_choice == "tab":
         model_name = input('models_name')
         model_index = input('models_index')
+        params["model_index"] = model_index
     params["model_name"] = model_name
-    params["model_index"] = model_index
 
     main(params)
