@@ -83,13 +83,13 @@ def affichage_roc(held_digits, dataloader, model, choice):
         x1, y1 = x2, y2
         s += 1
         sys.stdout.write('\rloading |  {}/{}'.format(s, len(T)))
-        time.sleep(0.001)
+        time.sleep(0.01)
         sys.stdout.write('\rloading /  {}/{}'.format(s, len(T)))
-        time.sleep(0.001)
+        time.sleep(0.01)
         sys.stdout.write('\rloading -  {}/{}'.format(s, len(T)) )
-        time.sleep(0.001)
+        time.sleep(0.01)
         sys.stdout.write('\rloading \\  {}/{}'.format(s, len(T)))
-        time.sleep(0.001)
+        time.sleep(0.01)
     sys.stdout.write('\rDone!     ')
 
 
