@@ -14,14 +14,34 @@ from torchvision.transforms import ToTensor
 import math as m
 
 
-def visu(params, dataloader, model):
+def visu(params, dataloader, models):
 #   params are the type of results
 #   plot ?
-# def get_detector ?
-
+#   def get_detector ?
+    
     held_digits = params['outliers']
     visu_choice = params['visu_choice']
 
+    if visu_choice == "roc":
+        affichage_roc(held_digits, dataloader, models[0], "roc")
+
+    if visu_choice == "tab":
+        X = range(10)
+        Y = []
+        for i in range(10):
+            Y.append(affichage_roc([i],dataloader, models[i], "tab"))
+        tab=[X,Y]
+        form="{0:10}{1:10}"
+        for val in tab:
+            print (form.format(*val))
+
+    else :
+        print("visu_choice has to be either roc or tab")
+
+
+
+
+def affichage_roc(held_digits, dataloader, model, choice):
     L = []
     for (image,label) in dataloader:
         for i in range (len(image)):
@@ -34,6 +54,10 @@ def visu(params, dataloader, model):
 
     nb_fake_pos = 0
     nb_true_pos = 0
+    x1, x2 = 0,0
+    y1, y2 = 0,0
+    aire = 0
+
     for el in L:
         if el[1] in held_digits:
             nb_fake_pos += 1
@@ -52,16 +76,21 @@ def visu(params, dataloader, model):
         el = visu(tau, held_digits, nb_fake_pos, nb_true_pos, L)
         Fake_pos.append(el[0])
         True_pos.append(el[1])
+        x2 = nb_fake_pos
+        y2 = nb_true_pos
+        aire += (x2 - x1) * (y2 + y1) / 2
+        x1, y1 = x2, y2
         s += 1
         print(s)
 
 
+    if choice == "roc":
+        plt.figure()
+        plt.plot(Fake_pos,True_pos)
+        plt.show() 
 
-    plt.figure()
-    plt.plot(Fake_pos,True_pos)
-    plt.show() 
-
-    return True
+    if choice == "tab":
+        return aire
 
 
 def dist(im1,im2):
