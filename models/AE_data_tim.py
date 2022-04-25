@@ -6,12 +6,13 @@ from torchvision import transforms
 from torchvision.datasets import MNIST
 import matplotlib.pyplot as plt
 
+import projet_ia_P1_04.datat
 
 # Tranformation images to pytorch tensor
 tensor_transform = transforms.ToTensor()
 
-dataset = MNIST('./data', train=True, download=True,
-                transform=tensor_transform)
+'''dataset = MNIST('./data', train=True, download=True,
+                transform=tensor_transform)'''
 
 
 class Autoencoder(nn.Module):
@@ -38,6 +39,7 @@ class Autoencoder(nn.Module):
             nn.Linear(64, 128),
             nn.ReLU(True),
             nn.Linear(128, 28 * 28),
+            # nn.Tanh())
             nn.Sigmoid()
         )
 
@@ -78,30 +80,43 @@ def training(epochs):
 
 training(epochs)
 
+'''
+def visualisation():
+    for data in dataloader:
+        images = data[0]
+        images_mod = images.reshape(-1, 28*28)
+        reconstructeds = model(images_mod)
+        for i, item in enumerate(images):
 
-def affichage_images():
+            # Reshape the array for plotting
+            item = item.reshape(-1, 28, 28)
+            item = item.detach().numpy()
+            plt.imshow(item[0])
 
+        for i, item in enumerate(reconstructeds):
+            item = item.reshape(-1, 28, 28)
+            item = item.detach().numpy()
+
+            plt.imshow(item[0])
+'''
+
+# visualisation()
+
+
+def test():
+    count = 0
     for (image, _) in dataloader:
 
         for i in range(len(image)):
-            fig = plt.figure()
             image_mod = image[i][0].reshape(-1, 28*28)
             reconstructed_mod = model(image_mod)
             reconstructed_mod = reconstructed_mod.reshape(28, 28)
             reconstructed_mod = reconstructed_mod.detach().numpy()
-            fig.add_subplot(1, 2, 1)
             plt.imshow(image[i][0])
-            plt.title("Image initiale")
-            fig.add_subplot(1, 2, 2)
+            # plt.show()
+
             plt.imshow(reconstructed_mod)
-            plt.title("Image reconstruite")
             plt.show()
 
 
-# affichage_images()
-
-def enregistrement():
-    torch.save(model, "AE_tim.pth")
-
-
-enregistrement()
+test()
