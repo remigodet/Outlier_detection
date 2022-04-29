@@ -11,7 +11,7 @@
 import torch
 from visu import visu
 from models.AE_thomasB import Autoencoder
-from models.AE_remi import Net
+# from models.AE_remi import Net
 
 
 def get_data(params: dict):
