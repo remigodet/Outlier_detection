@@ -96,6 +96,9 @@ def affichage_roc(held_digits, dataloader, model, choice):
         plt.figure()
         plt.plot(Fake_pos, True_pos, label='evaluation')
         plt.plot([0, 1], [0, 1], label="no skill")
+        plt.xlabel("False positive rate")
+        plt.ylabel('True positive rate')
+        plt.title('Roc curve - Efficiency of the autoencoder')
         plt.legend()
         plt.show()
 
