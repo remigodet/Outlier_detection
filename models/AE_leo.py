@@ -41,11 +41,11 @@ trainloader = torch.utils.data.DataLoader(
     mnist_trainset_holdout, batch_size=50)
 testloader = torch.utils.data.DataLoader(mnist_testset, batch_size=50)
 
+
 class Autoencoder(nn.Module):
     def __init__(self):
         super().__init__()
-          
-        
+
         self.encoder = nn.Sequential(
             nn.Linear(28**2, 256),
             nn.ReLU(),
@@ -69,68 +69,72 @@ class Autoencoder(nn.Module):
         decoded = self.decoder(encoded)
         return decoded
 
-model = autoencoder()
-loss_mse = nn.MSELoss()
-optimizer = torch.optim.Adam(model.parameters(), lr=0.0001)
 
-def train(epochs):
+if __name__ == '__main__':
 
-  t = time.time()
-  losses = []
-  outputs = []
-  model.train()
+    model = Autoencoder()
+    loss_mse = nn.MSELoss()
+    optimizer = torch.optim.Adam(model.parameters(), lr=0.0001)
 
-  for epoch in range(1,epochs+1) :
+    def train(epochs):
+
+        t = time.time()
+        losses = []
+        outputs = []
+        model.train()
+
+        for epoch in range(1, epochs+1):
+            for i, (images, labels) in enumerate(testloader):
+                for image in images:
+                    image = image.reshape(-1, 28*28)
+                    new_img = model(image)
+                    loss = loss_mse(new_img, image)
+                    losses.append(loss)
+
+                    optimizer.zero_grad()
+                    loss.backward()
+                    optimizer.step()
+                if i % 50 == 0:
+                    print(i)
+            outputs.append((epochs, image, new_img))
+
+            print(epoch, time.time()-t)
+            t = time.time()
+
     for i, (images, labels) in enumerate(testloader):
-      for image in images:  
-        image = image.reshape(-1, 28*28)
-        new_img = model(image)
-        loss = loss_mse(new_img, image)
-        losses.append(loss)
+        for image in images:
+            img = image
+            break
+        break
 
-        optimizer.zero_grad()
-        loss.backward()
-        optimizer.step()
-      if i % 50 == 0:
-        print(i)
-    outputs.append((epochs, image, new_img))
+    plt.imshow(img.squeeze())
+    print(len(testloader))
 
+    epochs = 5
 
-    print(epoch, time.time()-t)
+    train(epochs)
+
     t = time.time()
-
-for i, (images, labels) in enumerate(testloader):
-  for image in images:
-    img = image
-    break
-  break
-
-plt.imshow(img.squeeze())
-print(len(testloader))
-
-epochs = 5
-
-train(epochs)
-
-t = time.time()
-for i, (images, labels) in enumerate(testloader):
+    for i, (images, labels) in enumerate(testloader):
 
         # getting the test images
-  for image in images:
-    clear_output()
-    fig = plt.figure(figsize=(8, 8))
-    image = image.reshape(-1, 28*28)
-    new_img = model(image)
-    image = image.reshape(-1, 28, 28)
-    new_img = new_img.reshape(-1, 28, 28)
-    fig.add_subplot(2, 2, 1)
-    plt.imshow(image.squeeze())
-    fig.add_subplot(2, 2, 2)
-    plt.imshow((new_img.cpu().detach().numpy()).squeeze())
-    plt.show()
-    time.sleep(1)
-    if time.time() - t > 30:
-      break
-  if time.time() - t > 30:
-      break
+        for image in images:
+            clear_output()
+            fig = plt.figure(figsize=(8, 8))
+            image = image.reshape(-1, 28*28)
+            new_img = model(image)
+            image = image.reshape(-1, 28, 28)
+            new_img = new_img.reshape(-1, 28, 28)
+            fig.add_subplot(2, 2, 1)
+            plt.imshow(image.squeeze())
+            fig.add_subplot(2, 2, 2)
+            plt.imshow((new_img.cpu().detach().numpy()).squeeze())
+            plt.show()
+            time.sleep(1)
+            if time.time() - t > 30:
+                break
+        if time.time() - t > 30:
+            break
 
+    model = Autoencoder()
+    torch.save(model, 'AE_leoB-NA-001.pth')

@@ -10,7 +10,8 @@
 # imports
 import torch
 from visu import visu
-from models.AE_thomasB import Autoencoder
+from models.AE_leo import Autoencoder
+
 # from models.AE_remi import Net
 
 
@@ -41,6 +42,7 @@ def get_models(params: dict):
     if model_name == 'NAE_remi':
         exec('from models.{} import Net'.format(model_name))
     else:
+        print('from models.{} import Autoencoder'.format(model_name))
         exec('from models.{} import Autoencoder'.format(model_name))
 
     if params['visu_choice'] == "roc":
@@ -92,7 +94,10 @@ if __name__ == "__main__":
 
     if visu_choice == "roc":
         model_name = input("model_name")
-        params['outliers'] = [int(input('outliers'))]
+        liste_outliers = input('outliers').split(',')
+        for i in range(len(liste_outliers)):
+            liste_outliers[i] = int(liste_outliers[i])
+        params['outliers'] = liste_outliers
     if visu_choice == "tab":
         model_name = input('models_name')
         model_index = input('models_index')
