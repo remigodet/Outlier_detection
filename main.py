@@ -10,7 +10,7 @@
 # imports
 import torch
 from visu import visu
-from models.AE_leo import Autoencoder
+from models.AE_thomasB import Autoencoder
 
 # from models.AE_remi import Net
 

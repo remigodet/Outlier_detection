@@ -10,12 +10,23 @@ import torch.optim as optim
 from torchvision import datasets, transforms
 import matplotlib.pyplot as plt
 
+outliers = [2]
+
 transform = transforms.ToTensor()
-
-
 mnist_data = datasets.MNIST(root='./data', download=True, transform=transform)
+
+
+indexes = []
+neg_indexes = []
+for i in range(len(mnist_data)):
+    if mnist_data[i][1] not in outliers:
+        indexes.append(i)
+    else:
+        neg_indexes.append(i)
+
+mnist_trainset_pos = torch.utils.data.Subset(mnist_data, indexes)
 data_loader = torch.utils.data.DataLoader(
-    dataset=mnist_data, batch_size=64, shuffle=True)
+    mnist_trainset_pos, batch_size=64)
 
 dataiter = iter(data_loader)
 images, labels = dataiter.next()
@@ -78,4 +89,4 @@ if __name__ == '__main__':
     plt.show()
 
     model = Autoencoder()
-    torch.save(model, 'AE_thomasB-NA-001.pth')
+    torch.save(model, 'AE_thomasB-2-002.pth')
