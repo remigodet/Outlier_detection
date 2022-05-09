@@ -12,15 +12,16 @@ from torchvision.datasets import MNIST
 import matplotlib.pyplot as plt
 from torchvision.transforms import ToTensor
 import math as m
-import time 
+import time
 import time
 import sys
 
+
 def visu(params, dataloader, models):
-#   params are the type of results
-#   plot ?
-#   def get_detector ?
-    
+    #   params are the type of results
+    #   plot ?
+    #   def get_detector ?
+
     held_digits = params['outliers']
     visu_choice = params['visu_choice']
 
@@ -31,41 +32,40 @@ def visu(params, dataloader, models):
         X = range(10)
         Y = []
         for i in range(10):
-            Y.append(affichage_roc([i],dataloader, models[i], "tab"))
-        tab=[X,Y]
-        form="{0:10}{1:10}"
+            Y.append(affichage_roc([i], dataloader, models[i], "tab"))
+        tab = [X, Y]
+        form = "{0:10}{1:10}"
         for val in tab:
-            print (form.format(*val))
+            print(form.format(*val))
 
-    else :
+    else:
         print("visu_choice has to be either roc or tab")
-
 
 
 def affichage_roc(held_digits, dataloader, model, choice):
     L = []
-    for (image,label) in dataloader:
-        for i in range (len(image)):
-            im1 = image[i][0].reshape(-1,28*28)
+    for (image, label) in dataloader:
+        for i in range(len(image)):
+            im1 = image[i][0].reshape(-1, 28*28)
             im2 = model(im1)
-            d = dist(im1,im2)
-            L.append((d,label[i]))
+            d = dist(im1, im2)
+            L.append((d, label[i]))
 
-    moy = np.mean([L[i][0]for i in range (len(L))])
+    moy = np.mean([L[i][0]for i in range(len(L))])
 
     nb_fake_pos = 0
     nb_true_pos = 0
-    x1, x2 = 0,0
-    y1, y2 = 0,0
+    x1, x2 = 0, 0
+    y1, y2 = 0, 0
     aire = 0
 
     for el in L:
-        if el[1] in held_digits:
+        if int(el[1]) in held_digits:
             nb_fake_pos += 1
         else:
             nb_true_pos += 1
 
-    Total=len(L)
+    Total = len(L)
 
     Fake_pos = []
     True_pos = []
@@ -86,43 +86,43 @@ def affichage_roc(held_digits, dataloader, model, choice):
         time.sleep(0.01)
         sys.stdout.write('\rloading /  {}/{}'.format(s, len(T)))
         time.sleep(0.01)
-        sys.stdout.write('\rloading -  {}/{}'.format(s, len(T)) )
+        sys.stdout.write('\rloading -  {}/{}'.format(s, len(T)))
         time.sleep(0.01)
         sys.stdout.write('\rloading \\  {}/{}'.format(s, len(T)))
         time.sleep(0.01)
     sys.stdout.write('\rDone!     ')
 
-
     if choice == "roc":
         plt.figure()
-        plt.plot(Fake_pos,True_pos, label = 'evaluation')
-        plt.plot([0,1],[0,1], label = "no skill")
+        plt.plot(Fake_pos, True_pos, label='evaluation')
+        plt.plot([0, 1], [0, 1], label="no skill")
+        plt.xlabel("False positive rate")
+        plt.ylabel('True positive rate')
+        plt.title('Roc curve - Efficiency of the autoencoder')
         plt.legend()
-        plt.show() 
+        plt.show()
 
     if choice == "tab":
         return aire
 
 
-def dist(im1,im2):
-    n=len(im1)
-    d=0
+def dist(im1, im2):
+    n = len(im1)
+    d = 0
     for i in range(n):
         for j in range(n):
-            d+=(im1[i][j]-im2[i][j])**2
-            
+            d += (im1[i][j]-im2[i][j])**2
+
     d = m.sqrt(d)
     return (d)
+
 
 def visualize(tau, held_digits, nb_fake_pos, nb_true_pos, L):
     fake_pos = 0
     true_pos = 0
     for el in L:
-        if el[0]<tau and (el[1] not in held_digits): 
+        if el[0] < tau and (el[1] not in held_digits):
             true_pos += 1
-        if el[0]<tau and (el[1] in held_digits):
+        if el[0] < tau and (el[1] in held_digits):
             fake_pos += 1
     return (fake_pos/nb_fake_pos, true_pos/nb_true_pos)
-
-
-
