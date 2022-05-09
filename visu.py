@@ -29,11 +29,10 @@ def visu(params, dataloader, models):
         affichage_roc(held_digits, dataloader, models[0], "roc")
 
     elif visu_choice == "tab":
-        X = range(10)
         Y = []
-        for i in range(10):
-            Y.append(affichage_roc([i], dataloader, models[i], "tab"))
-        tab = [X, Y]
+        for i in range(len(held_digits)):
+            Y.append(affichage_roc(held_digits[i], dataloader, models[i], "tab"))
+        tab = [held_digits, Y]
         form = "{0:10}{1:10}"
         for val in tab:
             print(form.format(*val))
