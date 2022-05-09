@@ -6,6 +6,9 @@ import numpy as np
 import torch.nn as nn
 from torch.autograd import Variable
 import matplotlib.pyplot as plt
+########################################################################################################################################################################
+from mcmc import get_negative_samples
+########################################################################################################################################################################
 
 
 class Net(nn.Module):
@@ -54,67 +57,18 @@ class Net(nn.Module):
     def forward(self, x):
         # to format following non-conv models(flattened models)
         if x.shape == torch.Size([1, 784]):
-            y = x.reshape([1, 1, 28, 28])
+            x = x.reshape([1, 1, 28, 28])
             if torch.cuda.is_available():
-                y = y.cuda()
-            y = self.encoder(y)
-            y = self.decoder(y)
-            y = y.cpu().detach().numpy().flatten()
-            y = y.reshape(1, 28*28)
-            return y
+                x = x.cuda()
+            x = self.encoder(x)
+            x = self.decoder(x)
+            x = x.cpu().detach().numpy().flatten()
+            x = x.reshape(1, 28*28)
+            return x
         x = self.encoder(x)
         # x = x.view(x.size(0), -1)
         x = self.decoder(x)
         return x
-
-
-def MCMC(img, f, use_emcee=False):
-    '''
-    img: 1 28*28 flattened image to be used to initialise the mcmc
-    f : function F the log energy function
-    use_emcee : bool whether to use emcee or homemade mcmc algorithm
-    // remi for details
-    '''
-    # TODO pass *emcee and *initial states parameters as args
-
-    if use_emcee:
-        # emcee
-        import emcee
-        pos = img + np.abs(np.random.randn(28*28*2, 28*28))
-
-        number_of_walkers, number_of_dimensions = pos.shape
-        sampler = emcee.EnsembleSampler(
-            nwalkers=number_of_walkers, ndim=number_of_dimensions, log_prob_fn=f, live_dangerously=True)
-
-        sampler.run_mcmc(initial_state=pos, nsteps=150)
-        samples = sampler.get_chain(flat=True)
-        return samples
-
-    # mcmc maison
-    # TODO : optimiser etc
-    # TODO : verif convergence avec plot
-    res = []
-    number_of_walkers = 3
-    pos = img + np.random.randn(number_of_walkers, 28*28)
-    for i, sample in enumerate(pos):
-        print(100*i/(number_of_walkers))
-        try:
-            samples = [sample.numpy()]  # if image taken from dataloader
-        except:
-            samples = [sample]  # if image gen with numpy
-        for _ in range(1500):
-            candidate = np.random.normal(
-                samples[-1], 4)
-            # PASSER EN EXP !!!
-            a = f(candidate)
-            b = f(samples[-1])
-            p = min(1, a/b)
-            if np.random.random() < p:
-                samples.append(candidate)
-            else:
-                samples.append(samples[-1])
-        res += samples
-    return res
 
 
 def train_model(held_digit):
@@ -123,53 +77,21 @@ def train_model(held_digit):
 
         model.train()  # sets the module in training mode
         tr_loss = 0
-        # when to use mcmc
+#########################################################################################################################
         use_neg_loss = epoch in [4, 5, 6, 7]
         if use_neg_loss:  # condition on epoch
             with torch.no_grad():
-                # initial states
-                # todo multiple inital states
-                # une image aléatoire
-                # initial_state = [0]*28*28 + np.random.rand(28*28)*0.1
-                initial_state = np.array([0]*28*28)  # noise added in MCMC
-                # create f_likelihood log likelihood
-
-                def adapt_f(f_likelihood):
-                    # todo adapt this  to model WHEN REFACTORISATION
-                    '''
-                    f_likelihood : function to adapt to present model (input shape different for each)
-                    This is meant to be used as a decorator ( @ - see below).
-                    // Remi for explanation if bugs or not clear
-                    '''
-                    def f(x):
-                        x = torch.Tensor(x)
-                        x = x.reshape(1, 1, 28, 28)
-                        if torch.cuda.is_available():
-                            x = x.cuda()
-                        x = f_likelihood(x)
-                        x = x.cpu().detach().numpy().flatten()
-                        return x
-                    return f
-
-                @adapt_f
-                def f_likelihood(x): return -criterion(model(x), x)
-                res_mcmc = MCMC(initial_state.reshape(28*28),
-                                f_likelihood, use_emcee=True)
-                print("mcmc done")
-                print("")
-                # back to tensors
-                n = len(res_mcmc)
-                res_mcmc = np.array(res_mcmc)
-                res_mcmc = np.reshape(res_mcmc, (n, 1, 28, 28))
+                res_mcmc = get_negative_samples(model, criterion, 10)
+#########################################################################################################################
         for i, (images, labels) in enumerate(trainloader):
             # one batch
             # clearing the Gradients of the model parameters
             optimizer.zero_grad()
-            # pos =================================================================
+            # pos ======
             # getting the pos training set
             x_train, y_train = Variable(images), Variable(labels)
             y_train = x_train  # images are ground truth
-            n_true = len(x_train)
+
             # converting the data into GPU format
             if torch.cuda.is_available():
                 x_train = x_train.cuda()
@@ -179,12 +101,12 @@ def train_model(held_digit):
             output_train = model(x_train)
 
             # computing the training loss for pos samples
-            pos_loss_train = criterion(output_train, y_train)
+            loss = criterion(output_train, y_train)
 
-            # neg =========================================================
+            # neg =====
             # print(iter(neg_trainloader))
             # next item of iterator made from torch dataloader
-
+##############################################################################################
             if use_neg_loss:
                 # taking small bit of res_mcmc
                 # pas toujours les mêmes # TODO mélanger res_mcmc
@@ -194,21 +116,17 @@ def train_model(held_digit):
                 output_mcmc = model(x_mcmc)
                 neg_loss_train = criterion(output_mcmc, x_mcmc)
                 n_false = len(x_mcmc)
-            else:
-                neg_loss_train = 0
-                n_false = 0
-
-            # ================ computing final loss ===================
-
-            loss_train = (n_true*pos_loss_train - n_false *
-                          neg_loss_train) / (n_true+n_false)
-            print(loss_train.__str__(), end='\r')
-            loss_train.backward()
+                n_true = len(x_train)
+                loss = (n_true*loss - n_false *
+                        neg_loss_train) / (n_true+n_false)
+############################################################################################
+            print(loss.__str__(), end='\r')
+            loss.backward()
             optimizer.step()
-            tr_loss = loss_train.item()
+            tr_loss = loss.item()
         print("\n")
         print('Epoch : ', epoch+1, '\t', 'loss :',
-              loss_train)
+              loss)
 
     # todo ajouter params
 
@@ -441,4 +359,3 @@ if __name__ == '__main__':
     # results(models)
 
     print("all done !")
-print("using NAE remi")
