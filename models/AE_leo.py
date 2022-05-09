@@ -17,7 +17,7 @@ from torchvision.transforms import ToTensor
 import time
 from torch.autograd import Variable
 import numpy as np
-from IPython.display import clear_output
+# from IPython.display import clear_output
 
 # datasets
 mnist_trainset = datasets.MNIST(
@@ -119,7 +119,7 @@ if __name__ == '__main__':
 
         # getting the test images
         for image in images:
-            clear_output()
+            # clear_output()
             fig = plt.figure(figsize=(8, 8))
             image = image.reshape(-1, 28*28)
             new_img = model(image)

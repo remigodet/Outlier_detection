@@ -12,6 +12,10 @@ import torch
 from visu import visu
 from models.AE_leo import Autoencoder
 
+
+# globals
+Net = None
+Autoencoder = None
 # from models.AE_remi import Net
 
 
@@ -30,7 +34,7 @@ def get_data(params: dict):
 
 def get_models(params: dict):
     '''
-    :name: nomenclature of model ex: AE_leo-17-0001.pth
+    :model_name: nomenclature of model ex: AE_leo-17-0001.pth
     '''
     # for roc, get the saved model from saved_models (file in .pth
     # for tab, get the 10 saved models with each digit as an outlier
@@ -38,13 +42,15 @@ def get_models(params: dict):
 
     # TODO try and except error to see if model works with the data format
     model_name = params['model_name'].split('-')[0]
-    print(params['model_name'], model_name)
     if model_name == 'NAE_remi':
-        exec('from models.{} import Net'.format(model_name))
+        exec('from models.{} import Net'.format(model_name), globals())
     else:
-        print('from models.{} import Autoencoder'.format(model_name))
-        exec('from models.{} import Autoencoder'.format(model_name))
-
+        print('from models.{} import Autoencoder'.format(model_name), globals())
+        exec('from models.{} import Autoencoder'.format(model_name), globals())
+    if Net is not None:
+        print("Net loaded")  # debug
+    if Autoencoder is not None:
+        print("Autoencoder loaded")  # debug
     if params['visu_choice'] == "roc":
         model = torch.load("saved_models/{}".format(params['model_name']))
         return [model]

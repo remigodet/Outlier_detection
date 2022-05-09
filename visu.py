@@ -50,9 +50,8 @@ def affichage_roc(held_digits, dataloader, model, choice):
             im2 = model(im1)
             d = dist(im1, im2)
             L.append((d, label[i]))
-
     moy = np.mean([L[i][0]for i in range(len(L))])
-
+    print("distances", L)
     nb_fake_pos = 0
     nb_true_pos = 0
     x1, x2 = 0, 0
@@ -83,13 +82,6 @@ def affichage_roc(held_digits, dataloader, model, choice):
         x1, y1 = x2, y2
         s += 1
         sys.stdout.write('\rloading |  {}/{}'.format(s, len(T)))
-        time.sleep(0.01)
-        sys.stdout.write('\rloading /  {}/{}'.format(s, len(T)))
-        time.sleep(0.01)
-        sys.stdout.write('\rloading -  {}/{}'.format(s, len(T)))
-        time.sleep(0.01)
-        sys.stdout.write('\rloading \\  {}/{}'.format(s, len(T)))
-        time.sleep(0.01)
     sys.stdout.write('\rDone!     ')
 
     if choice == "roc":

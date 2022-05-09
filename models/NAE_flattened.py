@@ -52,19 +52,21 @@ class Net(nn.Module):
         # Defining the forward pass
 
     def forward(self, x):
+
         # to format following non-conv models(flattened models)
         if x.shape == torch.Size([1, 784]):
-            y = x.reshape([1, 1, 28, 28])
+            x = x.reshape([1, 1, 28, 28])
             if torch.cuda.is_available():
-                y = y.cuda()
-            y = self.encoder(y)
-            y = self.decoder(y)
-            y = y.cpu().detach().numpy().flatten()
-            y = y.reshape(1, 28*28)
-            return y
+                x = x.cuda()
+            x = self.encoder(x)
+            x = self.decoder(x)
+            x = x.cpu().detach().numpy().flatten()
+            x = x.reshape(1, 28*28)
+            return x
         x = self.encoder(x)
         # x = x.view(x.size(0), -1)
         x = self.decoder(x)
+        print("ok")
         return x
 
 
@@ -441,4 +443,3 @@ if __name__ == '__main__':
     # results(models)
 
     print("all done !")
-print("using NAE remi")
