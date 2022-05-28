@@ -66,12 +66,17 @@ def visu(params, dataloader, models):
 
 def affichage_roc(held_digits, dataloader, model, choice, criterion="outliers", number=0):
     L = []
+    m, M = 100000, 0
     for (image, label) in dataloader:
         for i in range(len(image)):
             im1 = image[i][0].reshape(-1, 28*28)
             im2 = model(im1)
             d = dist(im1, im2)
             L.append((d, label[i]))
+            if m > d:
+              m = d
+            if M < d:
+              M = d
     moy = np.mean([L[i][0]for i in range(len(L))])
     nb_fake_pos = 0
     nb_true_pos = 0
@@ -87,12 +92,14 @@ def affichage_roc(held_digits, dataloader, model, choice, criterion="outliers", 
         else:
             nb_true_pos += 1
 
-    Total = len(L)
-
     Fake_pos = []
     True_pos = []
 
-    T = list(np.linspace(0.0005*moy, 10*moy, 1000))
+    if M / m > 100000:
+      T = list(np.linspace(0.0005*moy, 10*moy, 1000))
+
+    else:
+      T = list(np.linspace(m, M, 1000))
 
     s = 0
     compt = 0
