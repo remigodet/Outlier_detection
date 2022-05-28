@@ -56,7 +56,8 @@ def visu(params, dataloader, models):
         for i in range(len(held_digits)):
             Y.append(
                 round(affichage_roc([held_digits[i]], dataloader, models[i], "tab"), 3))
-        tab = [['Area'] + held_digits, ['Performance'] + Y]
+        tab = [['Model'] + params['model_name'],
+               ['Outlier'] + held_digits, ['Performance'] + Y]
         print(tabulate(tab))
 
     else:
