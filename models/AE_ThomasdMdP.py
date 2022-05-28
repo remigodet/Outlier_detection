@@ -1,12 +1,12 @@
-import numpy as np                       
-import torch                       
-import torchvision                       
-from torch import nn                       
-from torch.autograd import Variable                       
-from torchvision.datasets import MNIST                       
-from torchvision.transforms import transforms                       
-from torchvision.utils import save_image
-import matplotlib.pyplot as plt
+
+import torch
+# import torchvision
+from torch import nn
+from torch.autograd import Variable
+# from torchvision.datasets import MNIST
+# from torchvision.transforms import transforms
+# from torchvision.utils import save_image
+# import matplotlib.pyplot as plt
 
 
 class Autoencoder(nn.Module):
@@ -44,15 +44,14 @@ class Autoencoder(nn.Module):
                                                       batch_size=self.batchSize,
                                                       shuffle=True)
 
-        self.optimizer = torch.optim.Adam(self.parameters(), lr=self.learningRate, weight_decay=1e-5)
+        self.optimizer = torch.optim.Adam(
+            self.parameters(), lr=self.learningRate, weight_decay=1e-5)
         self.criterion = nn.MSELoss()
-        
 
     def forward(self, x):
         x = self.encoder(x)
         x = self.decoder(x)
         return x
-
 
     def trainModel(self):
         for epoch in range(self.epochs):
@@ -71,10 +70,3 @@ class Autoencoder(nn.Module):
 
             print('epoch [{}/{}], loss:{:.4f}'
                   .format(epoch + 1, self.epochs, loss.data))
-
-
-'''model = Autoencoder()
-model.trainModel()
-
-
-torch.save(model,'AE_ThomasdMdP.pth')'''
