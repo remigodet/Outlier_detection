@@ -27,28 +27,35 @@ def visu(params, dataloader, models):
     visu_choice = params['visu_choice']
 
     if visu_choice == "roc":
-      if len(held_digits) > 1:
-        for i in range(len(held_digits)):
-          affichage_roc([held_digits[i]], dataloader, models[i], "roc", "outliers")
-        
+        if len(held_digits) > 1:
+            for i in range(len(held_digits)):
+                affichage_roc([held_digits[i]], dataloader,
+                              models[i], "roc", "outliers")
 
-      if len(models) > 1:
+        elif len(models) > 1:
 
-        for i in range(len(models)):
+            for i in range(len(models)):
 
-          affichage_roc([held_digits[0]], dataloader, models[i], "roc", "models", i+1)
+                affichage_roc([held_digits[0]], dataloader,
+                              models[i], "roc", "models", i+1)
+        else:
+            affichage_roc([held_digits[0]], dataloader, models[0], "roc")
 
-      plt.plot([0, 1], [0, 1], label="no skill")
-      plt.xlabel("False positive rate")
-      plt.ylabel('True positive rate')
-      plt.title('Roc curve - Efficiency of the autoencoder')
-      plt.legend()
-      plt.show()
+        plt.plot([0, 1], [0, 1], label="no skill")
+        plt.xlabel("False positive rate")
+        plt.ylabel('True positive rate')
+        plt.title('Roc curve - Efficiency of the autoencoder')
+        plt.legend()
+        plt.show()
 
     elif visu_choice == "tab":
         Y = []
+        # print(models)
+        # print(held_digits)
+        # print(len(held_digits))
         for i in range(len(held_digits)):
-            Y.append(round(affichage_roc([held_digits[i]], dataloader, models[i], "tab"), 3))
+            Y.append(
+                round(affichage_roc([held_digits[i]], dataloader, models[i], "tab"), 3))
         tab = [held_digits, Y]
         print(tabulate(tab))
 
@@ -56,7 +63,7 @@ def visu(params, dataloader, models):
         print("visu_choice has to be either roc or tab")
 
 
-def affichage_roc(held_digits, dataloader, model, choice, criterion = "outliers", number = 0):
+def affichage_roc(held_digits, dataloader, model, choice, criterion="outliers", number=0):
     L = []
     for (image, label) in dataloader:
         for i in range(len(image)):
@@ -87,9 +94,10 @@ def affichage_roc(held_digits, dataloader, model, choice, criterion = "outliers"
     T = [moy*0.01*i for i in range(1000)]
 
     s = 0
+    compt = 0
 
     for tau in T:
-
+        compt += 1
         el = visualize(tau, held_digits, nb_fake_pos, nb_true_pos, L)
         Fake_pos.append(el[0])
         True_pos.append(el[1])
@@ -100,18 +108,20 @@ def affichage_roc(held_digits, dataloader, model, choice, criterion = "outliers"
         aire += (x2 - x1) * (y2 + y1) / 2
         x1, y1 = x2, y2
         s += 1
-
+        if compt % 50 == 0:
+            print(compt, '/ 1000')
 
     if choice == "roc":
 
-      if criterion == "outliers":
+        if criterion == "outliers":
 
-        plt.plot(Fake_pos, True_pos, label='evaluation with ' + str(held_digits[0]) + ' as an outlier')
+            plt.plot(Fake_pos, True_pos, label='evaluation with ' +
+                     str(held_digits[0]) + ' as an outlier')
 
-      if criterion == "models":
-        
-        plt.plot(Fake_pos, True_pos, label='evaluation with the ' + ordinal(number) + ' model')
-        
+        if criterion == "models":
+
+            plt.plot(Fake_pos, True_pos, label='evaluation with the ' +
+                     ordinal(number) + ' model')
 
     if choice == "tab":
         return aire
@@ -138,4 +148,7 @@ def visualize(tau, held_digits, nb_fake_pos, nb_true_pos, L):
             fake_pos += 1
     return (fake_pos/nb_fake_pos, true_pos/nb_true_pos)
 
-ordinal = lambda n: "%d%s" % (n,"tsnrhtdd"[(n//10%10!=1)*(n%10<4)*n%10::4]) #just gives the ordinal version of a number (e.g 1st for 1)
+
+# just gives the ordinal version of a number (e.g 1st for 1)
+def ordinal(n): return "%d%s" % (
+    n, "tsnrhtdd"[(n//10 % 10 != 1)*(n % 10 < 4)*n % 10::4])

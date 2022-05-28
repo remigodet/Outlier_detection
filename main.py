@@ -11,6 +11,7 @@
 import torch
 from visu import visu
 from models.AE_thomasB import Autoencoder
+from models.NAE_remi import Net
 
 
 # globals
@@ -41,29 +42,28 @@ def get_models(params: dict):
     # refer to README.md for nomenclature of the name
 
     # TODO try and except error to see if model works with the data format
-    model_name = params['model_name'].split('-')[0]
+    model_name = params['model_name'][0].split('-')[0]
+    print(model_name)
     if model_name == 'NAE_remi':
         exec('from models.{} import Net'.format(model_name), globals())
+        print(1)
     else:
-        print('from models.{} import Autoencoder'.format(model_name), globals())
         exec('from models.{} import Autoencoder'.format(model_name), globals())
     if Net is not None:
         print("Net loaded")  # debug
     if Autoencoder is not None:
         print("Autoencoder loaded")  # debug
-    if params['visu_choice'] == "roc":
-        model = torch.load("saved_models/{}".format(params['model_name']))
-        return [model]
-    if params['visu_choice'] == "tab":
-        models = []
-        for i in range(10):
-            try:
-                model = torch.load("saved_models\{}".format(
-                    model_name+"-"+str(i)+"-"+params['model_index']+'.pth'))
-                models.append(model)
-            except:
-                print('Fail to load '+str(i))
-        return models
+    models = []
+    print(params['model_name'])
+
+    for model in params['model_name']:
+        try:
+            print(["saved_models/{}".format(model)])
+            model_loaded = torch.load("saved_models/{}".format(model))
+            models.append(model_loaded)
+        except:
+            print('Fail to load')
+    return models
 
 
 def visualize(params: dict, dataloader, models):
@@ -97,17 +97,17 @@ if __name__ == "__main__":
     visu_choice = input("choice of visualisation : roc or tab")
     params["dataset"] = "test"  # "train" for training
     params['visu_choice'] = visu_choice
+    liste_outliers = input('outliers').split(',')
+    for i in range(len(liste_outliers)):
+        liste_outliers[i] = int(liste_outliers[i])
+    params['outliers'] = liste_outliers
 
     if visu_choice == "roc":
         model_name = input("model_name")
-        liste_outliers = input('outliers').split(',')
-        for i in range(len(liste_outliers)):
-            liste_outliers[i] = int(liste_outliers[i])
-        params['outliers'] = liste_outliers
+
     if visu_choice == "tab":
+
         model_name = input('models_name')
-        model_index = input('models_index')
-        params["model_index"] = model_index
-    params["model_name"] = model_name
+    params["model_name"] = model_name.split(',')
 
     main(params)
