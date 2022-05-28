@@ -92,7 +92,7 @@ def affichage_roc(held_digits, dataloader, model, choice, criterion="outliers", 
     Fake_pos = []
     True_pos = []
 
-    T = [moy*0.01*i for i in range(1000)]
+    T = list(np.linspace(0.0005*moy, 10*moy, 1000))
 
     s = 0
     compt = 0
