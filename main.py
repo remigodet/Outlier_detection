@@ -81,7 +81,8 @@ def get_models(params: dict):
     for model in params['model_name']:
         try:
             print(["saved_models/{}".format(model)])
-            model_loaded = torch.load("saved_models/{}".format(model))
+            model_loaded = torch.load(
+                "saved_models/{}".format(model), map_location=torch.device('cpu'))
             models.append(model_loaded)
         except:
             print('Fail to load')
