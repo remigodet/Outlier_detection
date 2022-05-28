@@ -441,4 +441,3 @@ if __name__ == '__main__':
     # results(models)
 
     print("all done !")
-print("using NAE remi")

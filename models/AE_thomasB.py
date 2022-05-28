@@ -1,35 +1,9 @@
 # source = https://www.youtube.com/watch?v=zp8clK9yCro&t=420s
 
 
-from turtle import forward
-from matplotlib import pyplot as plt
-from matplotlib.transforms import Transform
 import torch
 import torch.nn as nn
 import torch.optim as optim
-from torchvision import datasets, transforms
-import matplotlib.pyplot as plt
-
-outliers = [2]
-
-transform = transforms.ToTensor()
-mnist_data = datasets.MNIST(root='./data', download=True, transform=transform)
-
-
-indexes = []
-neg_indexes = []
-for i in range(len(mnist_data)):
-    if mnist_data[i][1] not in outliers:
-        indexes.append(i)
-    else:
-        neg_indexes.append(i)
-
-mnist_trainset_pos = torch.utils.data.Subset(mnist_data, indexes)
-data_loader = torch.utils.data.DataLoader(
-    mnist_trainset_pos, batch_size=64)
-
-dataiter = iter(data_loader)
-images, labels = dataiter.next()
 
 
 class Autoencoder(nn.Module):
@@ -47,6 +21,34 @@ class Autoencoder(nn.Module):
 
 
 if __name__ == '__main__':
+
+    # from turtle import forward
+    from matplotlib import pyplot as plt
+    from matplotlib.transforms import Transform
+
+    from torchvision import datasets, transforms
+    import matplotlib.pyplot as plt
+
+    outliers = [2]
+
+    transform = transforms.ToTensor()
+    mnist_data = datasets.MNIST(
+        root='./data', download=True, transform=transform)
+
+    indexes = []
+    neg_indexes = []
+    for i in range(len(mnist_data)):
+        if mnist_data[i][1] not in outliers:
+            indexes.append(i)
+        else:
+            neg_indexes.append(i)
+
+    mnist_trainset_pos = torch.utils.data.Subset(mnist_data, indexes)
+    data_loader = torch.utils.data.DataLoader(
+        mnist_trainset_pos, batch_size=64)
+
+    dataiter = iter(data_loader)
+    images, labels = dataiter.next()
 
     model = Autoencoder()
     criteron = nn.MSELoss()

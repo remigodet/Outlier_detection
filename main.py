@@ -8,16 +8,26 @@
 # 1.4: interface ?
 
 # imports
+from models.NAE_remi import Net as NAE_remi
+from models.AE_tim import Autoencoder as AE_tim
+from models.AE_ThomasdMdP import Autoencoder as AE_ThomasdMdP
+from models.AE_thomasB import Autoencoder as AE_thomasB
+from models.AE_leo import Autoencoder as AE_leo
 import torch
 from visu import visu
-from models.AE_thomasB import Autoencoder
-from models.NAE_remi import Net
+
+classes = dict()
+classes['AE_leo'] = AE_leo
+classes['AE_thomasB'] = AE_thomasB
+classes['AE_ThomasdMdP'] = AE_ThomasdMdP
+classes['AE_tim'] = AE_tim
+classes['NAE_remi'] = NAE_remi
+# etc for other models
 
 
-# globals
+# global variables to load models onto
 Net = None
 Autoencoder = None
-# from models.AE_remi import Net
 
 
 def get_data(params: dict):
@@ -37,22 +47,34 @@ def get_models(params: dict):
     '''
     :model_name: nomenclature of model ex: AE_leo-17-0001.pth
     '''
+    global Autoencoder, Net
     # for roc, get the saved model from saved_models (file in .pth
     # for tab, get the 10 saved models with each digit as an outlier
     # refer to README.md for nomenclature of the name
 
-    # TODO try and except error to see if model works with the data format
     model_name = params['model_name'][0].split('-')[0]
-    print(model_name)
-    if model_name == 'NAE_remi':
-        exec('from models.{} import Net'.format(model_name), globals())
-        print(1)
-    else:
-        exec('from models.{} import Autoencoder'.format(model_name), globals())
-    if Net is not None:
-        print("Net loaded")  # debug
-    if Autoencoder is not None:
-        print("Autoencoder loaded")  # debug
+    # if model_name == 'NAE_remi':
+    #     exec('from models.{} import Net'.format(model_name), globals())
+    #     print(1)
+    # else:
+    #     exec('from models.{} import Autoencoder'.format(model_name), globals())
+    # if Net is not None:
+    #     print("Net loaded")  # debug
+    # if Autoencoder is not None:
+    #     print("Autoencoder loaded")  # debug
+
+    if model_name not in classes.keys():
+        raise Exception(
+            f"The name {model_name} is not added to the classes dict -- see def in main.py")
+    # remi to be changed to gpu
+    try:
+        if model_name == 'NAE_remi':
+            Net = classes[model_name]
+        else:
+            Autoencoder = classes[model_name]
+    except:
+        raise Exception(f"The {model_name} class not found.")
+
     models = []
     print(params['model_name'])
 
@@ -63,6 +85,7 @@ def get_models(params: dict):
             models.append(model_loaded)
         except:
             print('Fail to load')
+            raise Exception(f"Failed to load {model_name}.")
     return models
 
 

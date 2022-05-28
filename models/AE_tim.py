@@ -53,18 +53,6 @@ class Autoencoder(nn.Module):
         return decoded  # , latent
 
 
-epochs = 5
-batch_size = 32
-learning_rate = 1e-2
-dataloader = DataLoader(dataset, batch_size=batch_size, shuffle=True)
-
-model = Autoencoder()
-# model.cuda()
-loss_function = nn.MSELoss()
-optimizer = torch.optim.AdamW(
-    model.parameters(), lr=learning_rate)
-
-
 def training(epochs):
     for epoch in range(epochs):
         for data in dataloader:
@@ -84,9 +72,6 @@ def training(epochs):
             optimizer.step()
             optimizer.zero_grad()
         print(f'epoch [{epoch + 1}/{epochs}], loss:{loss.data.item()}')
-
-
-training(epochs)
 
 
 def visualisation():
@@ -159,4 +144,18 @@ def test():
         plt.show()'''
 
 
-# test()
+if __name__ == "__main__":
+    epochs = 5
+    batch_size = 32
+    learning_rate = 1e-2
+    dataloader = DataLoader(dataset, batch_size=batch_size, shuffle=True)
+
+    model = Autoencoder()
+    # model.cuda()
+    loss_function = nn.MSELoss()
+    optimizer = torch.optim.AdamW(
+        model.parameters(), lr=learning_rate)
+
+    training(epochs)
+
+    # test()
