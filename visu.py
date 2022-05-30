@@ -96,10 +96,10 @@ def affichage_roc(held_digits, dataloader, model, choice, criterion="outliers", 
     True_pos = []
 
     if (M / (m+0.0000001)) > 100000:
-        T = list(np.linspace(0.0005*moy, 10*moy, 1000))
+        T = list(np.linspace(0.0005*moy, 10*moy, 500))
 
     else:
-        T = list(np.linspace(m, M, 1000))
+        T = list(np.linspace(m, M, 500))
 
     s = 0
     compt = 0
@@ -137,14 +137,15 @@ def affichage_roc(held_digits, dataloader, model, choice, criterion="outliers", 
 
 
 def dist(im1, im2):
-    n = len(im1)
-    d = 0
-    for i in range(n):
-        for j in range(n):
-            d += (im1[i][j]-im2[i][j])**2
+    # n = len(im1)
+    # d = 0
+    # for i in range(n):
+    #     for j in range(n):
+    #         d += (im1[i][j]-im2[i][j])**2
 
-    d = m.sqrt(d)
-    return (d)
+    # d = np.sqrt(d)
+    d2 = np.linalg.norm(im1-im2)
+    return d2
 
 
 def visualize(tau, held_digits, nb_fake_pos, nb_true_pos, L):
