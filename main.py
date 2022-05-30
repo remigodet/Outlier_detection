@@ -22,6 +22,8 @@ classes['AE_thomasB'] = AE_thomasB
 classes['AE_ThomasdMdP'] = AE_ThomasdMdP
 classes['AE_tim'] = AE_tim
 classes['NAE_remi'] = NAE_remi
+classes['NAE_gpu'] = NAE_remi
+classes['AE_remi'] = NAE_remi
 # etc for other models
 
 
@@ -58,17 +60,13 @@ def get_models(params: dict):
     #     print(1)
     # else:
     #     exec('from models.{} import Autoencoder'.format(model_name), globals())
-    # if Net is not None:
-    #     print("Net loaded")  # debug
-    # if Autoencoder is not None:
-    #     print("Autoencoder loaded")  # debug
 
     if model_name not in classes.keys():
         raise Exception(
             f"The name {model_name} is not added to the classes dict -- see def in main.py")
     # remi to be changed to gpu
     try:
-        if model_name == 'NAE_remi':
+        if ('remi' in model_name) or ('gpu' in model_name):
             Net = classes[model_name]
         else:
             Autoencoder = classes[model_name]

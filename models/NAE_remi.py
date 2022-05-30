@@ -117,14 +117,14 @@ def MCMC(img, f, use_emcee=False):
     return res
 
 
-def train_model(held_digit):
+def train_model(held_digits):
 
     def train(epoch):
 
         model.train()  # sets the module in training mode
         tr_loss = 0
         # when to use mcmc
-        use_neg_loss = epoch in [4, 5, 6, 7]
+        use_neg_loss = epoch in [9, 8, 7]
         if use_neg_loss:  # condition on epoch
             with torch.no_grad():
                 # initial states
@@ -188,11 +188,12 @@ def train_model(held_digit):
             if use_neg_loss:
                 # taking small bit of res_mcmc
                 # pas toujours les mêmes # TODO mélanger res_mcmc
-                x_mcmc = torch.Tensor(res_mcmc[100*i:100*(i+1)])
+                x_mcmc = torch.Tensor(res_mcmc[500*i:500*(i+1)])
                 if torch.cuda.is_available():
                     x_mcmc = x_mcmc.cuda()
                 output_mcmc = model(x_mcmc)
-                neg_loss_train = criterion(output_mcmc, x_mcmc)
+                gamma = 0.8
+                neg_loss_train = gamma*criterion(output_mcmc, x_mcmc)
                 n_false = len(x_mcmc)
             else:
                 neg_loss_train = 0
@@ -235,8 +236,7 @@ def train_model(held_digit):
 
     # holdout
     indexes = []
-    neg_indexes = []
-    held_digits = [held_digit]  # changes batch size !
+    neg_indexes = []  # changes batch size !
     for i in range(len(mnist_trainset)):
         if mnist_trainset[i][1] not in held_digits:
             indexes.append(i)
@@ -272,7 +272,7 @@ def train_model(held_digit):
         criterion = criterion.cuda()
 
     # defining the number of epochs > 2 for mcmc loss
-    n_epochs = 8
+    n_epochs = 10
     # empty list to store training losses
     train_losses = []
     # training the model
@@ -371,10 +371,13 @@ def results(models):
             models_res.append(res)
         n = len(models)
         for i in range(n):
-            plt.bar([j+(i/(2*n)) for j in range(10)],
-                    models_res[i], width=1/(2*n), label=models[i][1])
-        plt.xticks([0, 1, 2, 3, 4, 5, 6, 7, 8, 9])
-        plt.legend()
+            # plt.bar([j+(i/(2*n)) for j in range(10)],
+            #         models_res[i], width=1/(2*n), label=models[i][1])
+            plt.subplot(5, 2, i+1)
+            plt.bar([j for j in range(10)],
+                    models_res[i], label=models[i][1])
+            plt.xticks([0, 1, 2, 3, 4, 5, 6, 7, 8, 9])
+            plt.legend()
         plt.show()
 
 
@@ -389,10 +392,6 @@ def visu_model(model):
     # visu model test set
     with torch.no_grad():
         plt.clf()
-        # plotting the training and validation loss
-        # plt.plot(train_losses, label='Training loss')
-        # plt.legend()
-        # plt.show()
 
         for j, (images, labels) in enumerate(testloader):
 
@@ -422,22 +421,30 @@ def visu_model(model):
 
 if __name__ == '__main__':
     # # new NAE
-    held_digit = 3
-    model = train_model(held_digit)
-    torch.save(model, "saved_models/model3.pth")  # gets stuck >< whyyyy
-    # plot
-    # models = []
-    # models.append((torch.load("saved_models/model0.pth"), "model0"))
-    # models.append((torch.load("saved_models/model1.pth"), "model1"))
-    # models.append((torch.load("saved_models/model3.pth"), "model3"))
-    # models.append((torch.load("saved_models/model5.pth"), "model5"))
-    # models.append((torch.load("saved_models/model6.pth"), "model6"))
-    # models.append((torch.load("saved_models/model8.pth"), "model8"))
-    # models.append((torch.load("saved_models/model9.pth"), "model9"))
+    models = []
+    # for i in range(1):
+    #     held = "".join([str(j) for j in range(10) if j != i])
+    #     print(
+    #         f"###################################################doing {held} !")
+    #     model = train_model([j for j in range(10) if j != i])
+    #     torch.save(model, f"saved_models/NAE_gpu-{held}-0.pth")
+    for i in [0, 1, 7, 8]:
+        print(f"DOING {i} ========================================")
+        model = train_model([i])
+        torch.save(model, f"saved_models/AE_remi-{i}-2.pth")
+    print(f"DOING NAN ========================================")
+    model = train_model([])
+    torch.save(model, f"saved_models/AE_remi-NAN-2.pth")
+
+    # for i in range(10):
+    #     models.append((torch.load(
+    #         "saved_models/NAE_gpu-{}-0.pth".format(held)), "model{}".format(held)))
 
     # # mcmc_out_of_model(model) # samples model a posteriori
     # # plots images vs reconstruction
     # visu_model(torch.load("saved_models/model8.pth"))
-    # results(models)
+    # results([(torch.load(
+    #         "saved_models/NAE_gpu-123456789-0.pth"), "123456789")])
+    # results([model])
 
     print("all done !")
